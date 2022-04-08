@@ -7,20 +7,29 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderSta
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Review;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepository;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.ReviewRepository;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.Result;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.ReviewStoreInfo;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.RequestReviewDto;
+import com.sesac.foodtruckorder.ui.dto.request.ReviewHistoryDto;
 import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
+import lombok.Builder;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,41 +48,36 @@ public class ReviewService {
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
-    public ReviewResponseDto.ReviewListDto findReviews(HttpServletRequest request,
-                                                       Long userId) {
+    public List<ReviewHistoryDto> findReviews(HttpServletRequest request,
+                                                       Long userId, Pageable pageable) {
 
-        String authorization = request.getHeader("Authorization");
+        // 1. 페이징 리뷰 목록 조회
+        Page<Order> orders = reviewRepository.findByReviews(pageable, userId, OrderStatus.COMPLETED);
 
-        Review findReview = reviewRepository.findByUserId(userId).orElseThrow(
-                () -> new ReviewException("댓글이 존재하지 않습니다.")
-        );
+        // 2. 리뷰 목록을 dto로 변환
+        List<ReviewHistoryDto> reviewHistoryDtoList = orders.getContent()
+                .stream()
+                .map(order -> ReviewHistoryDto.of(order))
+                .collect(Collectors.toList());
 
-        // 리뷰 관리 페이지
-        // 가게사진, 가게명, 주문 총금액, 별점, 리뷰작성일자, 리뷰내용
-        // 리뷰 - 별점, 리뷰작성일자, 리뷰내용
-        // 가게 - 가게사진, 가게명
-        // 주문 - 주문 총금액
+        // 3. 조회한 리뷰 목록(List)를 담을 Id을 Set객체를 이용해서 담을 거예여
+        Set<Long> storeIds = new HashSet<>();
 
-        // 리뷰
-        ReviewResponseDto.ReviewContentDto reviewContentDto = ReviewResponseDto.ReviewContentDto.of(findReview);
+        // 4. dto에 개수만큼 for문을 돌려서 id를 추출하고 그 id를 Set객체에 담을거예여
+        for (ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
+            storeIds.add(reviewHistoryDto.getStoreId());
+        }
 
-        // 가게
-        ReviewStoreInfo reviewStoreInfo = storeClient.storeInfo(authorization, findReview.getStoreId());
-        log.info("Return 받은 user 객체의 값 : {}", reviewStoreInfo);
+        // 5. Map을 받아올건데, storeClient Map<id, storeName>, Map<id, image> => 여러개
+        Map<Long, String> storeInfoMap = storeClient.getStoreInfoMap(request, storeIds);
 
-        // 주문
-        Order findOrder = orderRepository.findByReviewId(findReview.getId()).orElseThrow(
-                () -> new OrderException("주문 정보가 존재하지 않습니다.")
-        );
+        // 6. for문 돌면서 dto에 value인 Name을 업데이트해줘야돼
+        for (ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
+            String storeName = storeInfoMap.get(reviewHistoryDto.getStoreId());
+            reviewHistoryDto.changeStoreName(storeName);
+        }
 
-        // return Dto
-        return ReviewResponseDto.ReviewListDto.builder()
-                .imgUrl(reviewStoreInfo.getImgUrl())
-                .imgName(reviewStoreInfo.getImgName())
-                .storeName(reviewStoreInfo.getStoreName())
-                .orderPrice(findOrder.getOrderPrice())
-                .reviewContentDto(reviewContentDto)
-                .build();
+        return reviewHistoryDtoList;
     }
 
     /**

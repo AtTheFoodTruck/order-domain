@@ -4,9 +4,11 @@ import com.sesac.foodtruckorder.application.service.ReviewService;
 import com.sesac.foodtruckorder.ui.dto.Helper;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.RequestReviewDto;
+import com.sesac.foodtruckorder.ui.dto.request.ReviewHistoryDto;
 import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,15 +35,16 @@ public class ReviewController {
      **/
     @GetMapping("/orders/v1/reviews")
     public ResponseEntity<?> findReviews(HttpServletRequest request,
-                                         @RequestBody RequestReviewDto.RequestReviewList requestReviewList) {
+                                         @RequestBody RequestReviewDto.RequestReviewList requestReviewList,
+                                         Pageable pageable) {
 
         Long userId = requestReviewList.getUserId();
 
-        ReviewResponseDto.ReviewListDto reviews = reviewService.findReviews(request, userId);
+        List<ReviewHistoryDto> reviews = reviewService.findReviews(request, userId, pageable);
 
         return response.success(reviews);
     }
-
+1
     /**
      * Review 등록
      * @author jaemin

@@ -29,6 +29,10 @@ public class Review extends BaseEntity {
     // Store
     private Long storeId;
 
+    // order
+    @OneToOne(fetch = LAZY, mappedBy = "order_id")
+    private Order order;
+
     /** 생성 메서드 **/
     public static Review of(Long userId, Long storeId, RequestReviewDto.ReviewDto reviewDto) {
         Review review = new Review();
