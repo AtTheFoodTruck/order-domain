@@ -7,8 +7,11 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderSta
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Review;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepository;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.ReviewRepository;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.ReviewStoreInfo;
+import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.RequestReviewDto;
+import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Slf4j
@@ -27,6 +31,50 @@ public class ReviewService {
     private final OrderRepository orderRepository;
     private final ReviewRepository reviewRepository;
     private final Response response;
+    private final StoreClient storeClient;
+
+    /**
+     * Review 목록 조회
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022-04-08
+     **/
+    public ReviewResponseDto.ReviewListDto findReviews(HttpServletRequest request,
+                                                       Long userId) {
+
+        String authorization = request.getHeader("Authorization");
+
+        Review findReview = reviewRepository.findByUserId(userId).orElseThrow(
+                () -> new ReviewException("댓글이 존재하지 않습니다.")
+        );
+
+        // 리뷰 관리 페이지
+        // 가게사진, 가게명, 주문 총금액, 별점, 리뷰작성일자, 리뷰내용
+        // 리뷰 - 별점, 리뷰작성일자, 리뷰내용
+        // 가게 - 가게사진, 가게명
+        // 주문 - 주문 총금액
+
+        // 리뷰
+        ReviewResponseDto.ReviewContentDto reviewContentDto = ReviewResponseDto.ReviewContentDto.of(findReview);
+
+        // 가게
+        ReviewStoreInfo reviewStoreInfo = storeClient.storeInfo(authorization, findReview.getStoreId());
+        log.info("Return 받은 user 객체의 값 : {}", reviewStoreInfo);
+
+        // 주문
+        Order findOrder = orderRepository.findByReviewId(findReview.getId()).orElseThrow(
+                () -> new OrderException("주문 정보가 존재하지 않습니다.")
+        );
+
+        // return Dto
+        return ReviewResponseDto.ReviewListDto.builder()
+                .imgUrl(reviewStoreInfo.getImgUrl())
+                .imgName(reviewStoreInfo.getImgName())
+                .storeName(reviewStoreInfo.getStoreName())
+                .orderPrice(findOrder.getOrderPrice())
+                .reviewContentDto(reviewContentDto)
+                .build();
+    }
 
     /**
      * Review 등록
@@ -63,7 +111,7 @@ public class ReviewService {
      * 작성일 2022-04-08
     **/
     public ResponseEntity<?> deleteReview(Long userId, Long reviewId) {
-        
+
         // 1. review 정보 조회
         Review findReview = reviewRepository.findById(reviewId).orElseThrow(
                 () -> new ReviewException("존재하지 않는 리뷰 정보 입니다.")
@@ -73,7 +121,7 @@ public class ReviewService {
         if (!findReview.getUserId().equals(userId)) {
             return response.fail("해당 유저의 댓글 정보가 아닙니다", HttpStatus.BAD_REQUEST);
         }
-        
+
         // 3. review 정보 삭제
         reviewRepository.delete(findReview);
 

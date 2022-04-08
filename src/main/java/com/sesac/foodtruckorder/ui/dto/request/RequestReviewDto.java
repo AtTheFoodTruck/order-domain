@@ -75,4 +75,16 @@ public class RequestReviewDto {
         private Long reviewId;
         private Long userId;
     }
+
+    /**
+     * 리뷰 목록 조회
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022-04-08
+    **/
+    @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Data
+    public class RequestReviewList {
+        private Long userId;
+    }
 }

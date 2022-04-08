@@ -4,16 +4,15 @@ import com.sesac.foodtruckorder.application.service.ReviewService;
 import com.sesac.foodtruckorder.ui.dto.Helper;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.RequestReviewDto;
+import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Slf4j
@@ -26,8 +25,24 @@ public class ReviewController {
     private final Helper helper;
 
     /**
+     * Review 정보 조회 - 사용자 입장
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022-04-08
+     **/
+    @GetMapping("/orders/v1/reviews")
+    public ResponseEntity<?> findReviews(HttpServletRequest request,
+                                         @RequestBody RequestReviewDto.RequestReviewList requestReviewList) {
+
+        Long userId = requestReviewList.getUserId();
+
+        ReviewResponseDto.ReviewListDto reviews = reviewService.findReviews(request, userId);
+
+        return response.success(reviews);
+    }
+
+    /**
      * Review 등록
-     *
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022-04-08
