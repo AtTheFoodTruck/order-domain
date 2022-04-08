@@ -86,6 +86,7 @@ public class ReviewService {
      * @version 1.0.0
      * 작성일 2022-04-08
     **/
+    @Transactional
     public Long createReview(Long userId, RequestReviewDto.ReviewDto reviewDto) {
 
         // 1. 소비자는 주문 완료된 주문 정보를 조회한다
@@ -114,6 +115,7 @@ public class ReviewService {
      * @version 1.0.0
      * 작성일 2022-04-08
     **/
+    @Transactional
     public ResponseEntity<?> deleteReview(Long userId, Long reviewId) {
 
         // 1. review 정보 조회

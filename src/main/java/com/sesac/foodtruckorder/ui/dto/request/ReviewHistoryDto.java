@@ -40,5 +40,3 @@ public class ReviewHistoryDto {
         this.storeName = storeName;
     }
 }
-
-}
