@@ -15,4 +15,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("select o from Order o where o.review.id=:reviewId")
     Optional<Order> findByReviewId(Long reviewId);
+
+    Optional<Order> findByUserId(Long userId);
 }

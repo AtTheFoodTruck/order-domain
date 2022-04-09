@@ -6,17 +6,25 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderIte
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderStatus;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderItemRepository;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepository;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetItemsInfoDto;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.UserClient;
 import com.sesac.foodtruckorder.ui.dto.Response;
-import com.sesac.foodtruckorder.ui.dto.request.RequestOrderItemDto;
-import com.sesac.foodtruckorder.ui.dto.response.ResponseOrderItemDto;
+import com.sesac.foodtruckorder.ui.dto.request.OrderItemRequestDto;
+import com.sesac.foodtruckorder.ui.dto.response.OrderItemResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,19 +45,52 @@ public class OrderService {
      * @version 1.0.0
      * 작성일 2022-04-09
      **/
-    public ResponseOrderItemDto.FetchOrderDto fetchOrder(Long userId) {
-        return ResponseOrderItemDto.FetchOrderDto.builder().build();
+    public List<OrderItemResponseDto.FetchOrderDto> fetchOrder(HttpServletRequest request, Long userId) {
+
+        String authorization = request.getHeader("Authorization");
+
+        // 1. order 정보 조회
+        Order findOrder = orderRepository.findByUserId(userId).orElseThrow(
+                () -> new OrderException("장바구니 정보를 찾을 수 없습니다")
+        );
+
+        // 2. feign 통신, store 정보 조회
+        GetStoreResponse findStore = storeClient.getStore(authorization, String.valueOf(findOrder.getStoreId())).getData();
+
+        // 3. feign 통신 item 정보 조회
+        List<GetItemsInfoDto> data = storeClient.getItem(authorization, findOrder.getOrderItems().stream()
+                .map(orderItem -> orderItem.getItemId())
+                .filter(obj -> Objects.nonNull(obj))
+                .collect(Collectors.toUnmodifiableList())
+        ).getData();
+
+        Map<Long, String> itemMap = data.stream()
+                .collect(
+                        Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(), GetItemsInfoDto::getItemName)
+                );
+
+        // 4. OrderItem정보 조회
+        List<OrderItemResponseDto.FetchOrderDto> results = findOrder.getOrderItems()
+                .stream()
+                .map(orderItem ->
+                        OrderItemResponseDto.FetchOrderDto.of(
+                                findStore.getStoreName(),
+                                findStore.getImgUrl(),
+                                itemMap.get(orderItem.getItemId()),
+                                orderItem))
+                .collect(Collectors.toList());
+
+        return results;
     }
 
     /**
      * 장바구니에 아이템 담기
-     *
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022-04-07
      **/
     @Transactional
-    public void addItemToCart(RequestOrderItemDto.OrderItemDto cartItemDto, Long storeId, Long userId) {
+    public void addItemToCart(OrderItemRequestDto.OrderItemDto cartItemDto, Long storeId, Long userId) {
 
         // OrderItem Entity생성
         OrderItem orderItem = OrderItem.of(cartItemDto.getCartItemId(), cartItemDto.getUnitPrice(), cartItemDto.getCount());

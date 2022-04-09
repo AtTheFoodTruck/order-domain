@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
-public class RequestOrderItemDto {
+public class OrderItemRequestDto {
 
     /**
      * 장바구니 목록 조회 요청 DTO

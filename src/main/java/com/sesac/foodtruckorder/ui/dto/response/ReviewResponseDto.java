@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-public class ResponseReviewDto {
+public class ReviewResponseDto {
 
     /**
      * Review 목록 조회 응답 Dto
