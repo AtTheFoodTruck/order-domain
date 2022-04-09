@@ -1,4 +1,4 @@
-package com.sesac.foodtruckorder.infrastructure.query.http.dto;
+package com.sesac.foodtruckorder.infrastructure.query.http.dto.global;
 
 import lombok.Builder;
 import lombok.Data;

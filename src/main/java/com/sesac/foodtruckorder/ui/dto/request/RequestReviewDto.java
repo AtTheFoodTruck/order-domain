@@ -18,7 +18,7 @@ public class RequestReviewDto {
      **/
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
-    public class RequestReview {
+    public class RequestReviewForm {
         private Long userId;        // 사용자 ID
         @NotEmpty(message = "별점을 입력해주세요.")
         private int rating;         // 별점
@@ -29,13 +29,6 @@ public class RequestReviewDto {
         private String content;     // 리뷰 내용
         // private Long orderId;      // 주문 ID
     }
-
-    @Getter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class _ReviewImages {
-        private String imgName;
-        private String imgUrl;
-    }
-
 
     /**
      * Review 생성 Dto 
@@ -49,18 +42,24 @@ public class RequestReviewDto {
         private String content;
         private _ReviewImages images;
 
-        public static ReviewDto of(RequestReview requestReview) {
+        public static ReviewDto of(RequestReviewForm requestReviewForm) {
             _ReviewImages reviewImages = _ReviewImages.builder()
-                    .imgName(requestReview.getImgName())
-                    .imgUrl(requestReview.getImgUrl())
+                    .imgName(requestReviewForm.getImgName())
+                    .imgUrl(requestReviewForm.getImgUrl())
                     .build();
 
             return ReviewDto.builder()
-                    .rating(requestReview.getRating())
-                    .content(requestReview.getContent())
+                    .rating(requestReviewForm.getRating())
+                    .content(requestReviewForm.getContent())
                     .images(reviewImages)
                     .build();
         }
+    }
+
+    @Getter @Builder @NoArgsConstructor @AllArgsConstructor
+    public static class _ReviewImages {
+        private String imgName;
+        private String imgUrl;
     }
     /**
      * 리뷰 삭제 위한 DTO
@@ -77,7 +76,7 @@ public class RequestReviewDto {
     }
 
     /**
-     * 리뷰 목록 조회
+     * 리뷰 목록 조회 요청 Dto
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022-04-08

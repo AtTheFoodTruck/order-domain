@@ -4,8 +4,7 @@ import com.sesac.foodtruckorder.application.service.ReviewService;
 import com.sesac.foodtruckorder.ui.dto.Helper;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.RequestReviewDto;
-import com.sesac.foodtruckorder.ui.dto.request.ReviewHistoryDto;
-import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
+import com.sesac.foodtruckorder.ui.dto.response.ResponseReviewDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -21,38 +20,38 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-public class ReviewController {
+public class ReviewApiController {
 
     private ReviewService reviewService;
     private final Response response;
     private final Helper helper;
 
     /**
-     * Review 정보 조회 - 사용자 입장
+     * Review 목록 조회 - 사용자 입장
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
     @GetMapping("/orders/v1/reviews")
     public ResponseEntity<?> findReviews(HttpServletRequest request,
-                                         @RequestBody RequestReviewDto.RequestReviewList requestReviewList,
+                                         @RequestBody RequestReviewDto.RequestReviewList requestDto,
                                          Pageable pageable) {
 
-        Long userId = requestReviewList.getUserId();
+        Long userId = requestDto.getUserId();
 
-        List<ReviewHistoryDto> reviews = reviewService.findReviews(request, userId, pageable);
+        List<ResponseReviewDto.ReviewHistoryDto> reviews = reviewService.findReviews(request, userId, pageable);
 
         return response.success(reviews);
     }
 
     /**
-     * Review 등록
+     * Review 생성
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
     @PostMapping("/orders/v1/reviews")
-    public ResponseEntity<?> createReview(@RequestBody RequestReviewDto.RequestReview requestReview,
+    public ResponseEntity<?> createReview(@RequestBody RequestReviewDto.RequestReviewForm requestReviewForm,
                                           @Valid BindingResult results) {
 
         // validation check
@@ -60,8 +59,8 @@ public class ReviewController {
             return response.invalidFields(helper.refineErrors(results));
         }
 
-        Long userId = requestReview.getUserId();
-        RequestReviewDto.ReviewDto reviewDto = RequestReviewDto.ReviewDto.of(requestReview);
+        Long userId = requestReviewForm.getUserId();
+        RequestReviewDto.ReviewDto reviewDto = RequestReviewDto.ReviewDto.of(requestReviewForm);
 
         Long reviewId = reviewService.createReview(userId, reviewDto);
 

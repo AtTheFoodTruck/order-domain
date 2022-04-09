@@ -3,24 +3,37 @@ package com.sesac.foodtruckorder.ui.controller;
 import com.sesac.foodtruckorder.application.service.OrderItemService;
 import com.sesac.foodtruckorder.application.service.OrderService;
 import com.sesac.foodtruckorder.ui.dto.Response;
-import com.sesac.foodtruckorder.ui.dto.request.RequestItemDto;
+import com.sesac.foodtruckorder.ui.dto.request.RequestOrderItemDto;
+import com.sesac.foodtruckorder.ui.dto.response.ResponseOrderItemDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-public class OrderItemController {
+public class OrderCustomerApiController {
 
     private final OrderService orderService;
     private final OrderItemService orderItemService;
     private final Response response;
+
+    /**
+     * 장바구니 내역 조회
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022-04-09
+    **/
+    @GetMapping("/orders")
+    public ResponseEntity<?> fetchOrder(@RequestBody RequestOrderItemDto.RequestOrderItemList requestDto){
+        Long userId = requestDto.getUserId();
+        //
+        ResponseOrderItemDto.FetchOrderDto fetchOrderDto = orderService.fetchOrder(userId);
+        return response.success(fetchOrderDto);
+    }
+
 
     /**
      * 장바구니에 아이템 담기
@@ -29,16 +42,19 @@ public class OrderItemController {
      * 작성일 2022-04-07
      **/
     @PostMapping("/orders/v1/carts")
-    public ResponseEntity<?> addCartItem(@RequestBody RequestItemDto.RequestItem requestItem) {
+    public ResponseEntity<?> addCartItem(@RequestBody RequestOrderItemDto.RequestItem requestItem) {
+
+        Long storeId = requestItem.getStoreId();
+        Long userId = requestItem.getUserId();
 
         // OrderItem DTO 생성
-        RequestItemDto.OrderItemDto cartItemDto = RequestItemDto.OrderItemDto.of(-1L,
+        RequestOrderItemDto.OrderItemDto cartItemDto = RequestOrderItemDto.OrderItemDto.of(-1L,
                 requestItem.getStoreId(),
                 requestItem.getItemId(),
                 requestItem.getPrice(),
                 requestItem.getCount());
 
-        orderService.addItemToCart(cartItemDto, requestItem.getStoreId(), requestItem.getUserId());
+        orderService.addItemToCart(cartItemDto, storeId, userId);
 
         return response.success("", HttpStatus.NO_CONTENT);
     }
@@ -50,7 +66,7 @@ public class OrderItemController {
      * 작성일 2022-04-07
      **/
     @DeleteMapping("/orders/v1/carts")
-    public ResponseEntity<?> deleteOrderItem(@RequestBody RequestItemDto.RequestDeleteItem requestDeleteItem) {
+    public ResponseEntity<?> deleteOrderItem(@RequestBody RequestOrderItemDto.RequestDeleteItem requestDeleteItem) {
 
         // 장바구니에 존재하는 아이템 삭제
         // 장바구니의 크기가 0 이라면 order도 삭제
@@ -68,16 +84,15 @@ public class OrderItemController {
      * @version 1.0.0
      * 작성일 2022-04-07
      **/
-    public ResponseEntity<?> countControl(@RequestBody RequestItemDto.RequestCountItem requestCountItem) {
+    @PatchMapping("/orders/v1/carts")
+    public ResponseEntity<?> countControl(@RequestBody RequestOrderItemDto.RequestCountItem requestCountItem) {
 
         Long orderItemId = requestCountItem.getOrderItemId();
         boolean plusMinus = requestCountItem.isPlusMinus();
 
         orderService.countControl(orderItemId, plusMinus);
 
-        return response.success("");
+        return response.success("", HttpStatus.NO_CONTENT);
     }
-
-
 
 }
