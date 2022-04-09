@@ -80,4 +80,9 @@ public class Order extends BaseEntity {
 
         return this;
     }
+
+    /** 연관관계 세팅 **/
+    public void setReview(Review review) {
+        this.review = review;
+    }
 }
