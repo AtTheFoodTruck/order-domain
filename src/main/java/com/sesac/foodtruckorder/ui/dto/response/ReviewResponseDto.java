@@ -25,7 +25,7 @@ public class ReviewResponseDto {
 
         public static ReviewListDto of(Review review, long orderPrice, String imgUrl, String imgName, String storeName) {
             LocalDateTime createdDate = review.getCreatedDate();
-            String createReviewDate = createdDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String createReviewDate = createdDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 
             return ReviewListDto.builder()
                     .imgUrl(imgUrl)

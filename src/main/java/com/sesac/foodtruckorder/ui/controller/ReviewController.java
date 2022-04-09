@@ -44,7 +44,7 @@ public class ReviewController {
 
         return response.success(reviews);
     }
-1
+
     /**
      * Review 등록
      * @author jaemin

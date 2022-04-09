@@ -19,6 +19,7 @@ public interface StoreClient {
     Result<List<GetStoreResponse>> getStoreNameImageMap(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
                                                         @PathVariable("storeId") Iterable<Long> storeIds);
 
+    // 재사용성을 위해 default 메서드 이용
     default Map<Long, String> getStoreInfoMap(HttpServletRequest request, Set<Long> storeIds) {
         String authorization = request.getHeader("Authorization");
 
