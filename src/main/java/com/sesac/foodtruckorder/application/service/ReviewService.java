@@ -7,22 +7,14 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderSta
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Review;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepository;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.ReviewRepository;
-import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
-import com.sesac.foodtruckorder.infrastructure.query.http.dto.Result;
-import com.sesac.foodtruckorder.infrastructure.query.http.dto.ReviewStoreInfo;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.RequestReviewDto;
-import com.sesac.foodtruckorder.ui.dto.request.ReviewHistoryDto;
-import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
-import lombok.Builder;
-import lombok.Data;
+import com.sesac.foodtruckorder.ui.dto.response.ResponseReviewDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,23 +40,23 @@ public class ReviewService {
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
-    public List<ReviewHistoryDto> findReviews(HttpServletRequest request,
-                                                       Long userId, Pageable pageable) {
+    public List<ResponseReviewDto.ReviewHistoryDto> findReviews(HttpServletRequest request,
+                                                                Long userId, Pageable pageable) {
 
         // 1. 페이징 리뷰 목록 조회
         Page<Order> orders = reviewRepository.findByReviews(pageable, userId, OrderStatus.COMPLETED);
 
         // 2. 리뷰 목록을 dto로 변환
-        List<ReviewHistoryDto> reviewHistoryDtoList = orders.getContent()
+        List<ResponseReviewDto.ReviewHistoryDto> reviewHistoryDtoList = orders.getContent()
                 .stream()
-                .map(order -> ReviewHistoryDto.of(order))
+                .map(order -> ResponseReviewDto.ReviewHistoryDto.of(order))
                 .collect(Collectors.toList());
 
         // 3. 조회한 리뷰 목록(List)를 담을 Id을 Set객체를 이용해서 담을 거예여
         Set<Long> storeIds = new HashSet<>();
 
         // 4. dto에 개수만큼 for문을 돌려서 id를 추출하고 그 id를 Set객체에 담을거예여
-        for (ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
+        for (ResponseReviewDto.ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
             storeIds.add(reviewHistoryDto.getStoreId());
         }
 
@@ -72,7 +64,7 @@ public class ReviewService {
         Map<Long, String> storeInfoMap = storeClient.getStoreInfoMap(request, storeIds);
 
         // 6. for문 돌면서 dto에 value인 Name을 업데이트해줘야돼
-        for (ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
+        for (ResponseReviewDto.ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
             String storeName = storeInfoMap.get(reviewHistoryDto.getStoreId());
             reviewHistoryDto.changeStoreName(storeName);
         }
@@ -125,7 +117,7 @@ public class ReviewService {
 
         // 2. review 정보가 userId와 일치하는지 검증
         if (!findReview.getUserId().equals(userId)) {
-            return response.fail("해당 유저의 댓글 정보가 아닙니다", HttpStatus.BAD_REQUEST);
+            throw new ReviewException("해당 유저의 댓글 정보가 아닙니다");
         }
 
         // 3. review 정보 삭제
