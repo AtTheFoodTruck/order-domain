@@ -1,21 +1,15 @@
 package com.sesac.foodtruckorder.ui.controller;
 
 import com.sesac.foodtruckorder.application.service.OrderService;
-import com.sesac.foodtruckorder.ui.dto.Helper;
 import com.sesac.foodtruckorder.ui.dto.Response;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-public class OrderController {
+public class OrderCustomerController {
 
     private final OrderService orderService;
     private final Response response;
