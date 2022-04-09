@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-public class RequestReviewDto {
+public class ReviewRequestDto {
 
     /**
      * Review 생성 Request Form 데이터

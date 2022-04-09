@@ -1,6 +1,6 @@
 package com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity;
 
-import com.sesac.foodtruckorder.ui.dto.request.RequestReviewDto;
+import com.sesac.foodtruckorder.ui.dto.request.ReviewRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,7 +34,7 @@ public class Review extends BaseEntity {
     private Order order;
 
     /** 생성 메서드 **/
-    public static Review of(Long userId, Long storeId, RequestReviewDto.ReviewDto reviewDto) {
+    public static Review of(Long userId, Long storeId, ReviewRequestDto.ReviewDto reviewDto) {
         Review review = new Review();
         review.content = reviewDto.getContent();
         review.rating = reviewDto.getRating();

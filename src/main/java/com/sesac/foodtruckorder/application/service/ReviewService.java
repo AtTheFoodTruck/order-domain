@@ -9,8 +9,8 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.Orde
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.ReviewRepository;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
 import com.sesac.foodtruckorder.ui.dto.Response;
-import com.sesac.foodtruckorder.ui.dto.request.RequestReviewDto;
-import com.sesac.foodtruckorder.ui.dto.response.ResponseReviewDto;
+import com.sesac.foodtruckorder.ui.dto.request.ReviewRequestDto;
+import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -40,23 +40,23 @@ public class ReviewService {
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
-    public List<ResponseReviewDto.ReviewHistoryDto> findReviews(HttpServletRequest request,
+    public List<ReviewResponseDto.ReviewHistoryDto> findReviews(HttpServletRequest request,
                                                                 Long userId, Pageable pageable) {
 
         // 1. 페이징 리뷰 목록 조회
         Page<Order> orders = reviewRepository.findByReviews(pageable, userId, OrderStatus.COMPLETED);
 
         // 2. 리뷰 목록을 dto로 변환
-        List<ResponseReviewDto.ReviewHistoryDto> reviewHistoryDtoList = orders.getContent()
+        List<ReviewResponseDto.ReviewHistoryDto> reviewHistoryDtoList = orders.getContent()
                 .stream()
-                .map(order -> ResponseReviewDto.ReviewHistoryDto.of(order))
+                .map(order -> ReviewResponseDto.ReviewHistoryDto.of(order))
                 .collect(Collectors.toList());
 
         // 3. 조회한 리뷰 목록(List)를 담을 Id을 Set객체를 이용해서 담을 거예여
         Set<Long> storeIds = new HashSet<>();
 
         // 4. dto에 개수만큼 for문을 돌려서 id를 추출하고 그 id를 Set객체에 담을거예여
-        for (ResponseReviewDto.ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
+        for (ReviewResponseDto.ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
             storeIds.add(reviewHistoryDto.getStoreId());
         }
 
@@ -64,7 +64,7 @@ public class ReviewService {
         Map<Long, String> storeInfoMap = storeClient.getStoreInfoMap(request, storeIds);
 
         // 6. for문 돌면서 dto에 value인 Name을 업데이트해줘야돼
-        for (ResponseReviewDto.ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
+        for (ReviewResponseDto.ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
             String storeName = storeInfoMap.get(reviewHistoryDto.getStoreId());
             reviewHistoryDto.changeStoreName(storeName);
         }
@@ -79,7 +79,7 @@ public class ReviewService {
      * 작성일 2022-04-08
     **/
     @Transactional
-    public Long createReview(Long userId, RequestReviewDto.ReviewDto reviewDto) {
+    public Long createReview(Long userId, ReviewRequestDto.ReviewDto reviewDto) {
 
         // 1. 소비자는 주문 완료된 주문 정보를 조회한다
         // 1. userId로 order정보 꺼내오기, COMPLEDTED

@@ -3,8 +3,8 @@ package com.sesac.foodtruckorder.ui.controller;
 import com.sesac.foodtruckorder.application.service.OrderItemService;
 import com.sesac.foodtruckorder.application.service.OrderService;
 import com.sesac.foodtruckorder.ui.dto.Response;
-import com.sesac.foodtruckorder.ui.dto.request.RequestOrderItemDto;
-import com.sesac.foodtruckorder.ui.dto.response.ResponseOrderItemDto;
+import com.sesac.foodtruckorder.ui.dto.request.OrderItemRequestDto;
+import com.sesac.foodtruckorder.ui.dto.response.OrderItemResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,10 +27,10 @@ public class OrderCustomerApiController {
      * 작성일 2022-04-09
     **/
     @GetMapping("/orders")
-    public ResponseEntity<?> fetchOrder(@RequestBody RequestOrderItemDto.RequestOrderItemList requestDto){
+    public ResponseEntity<?> fetchOrder(@RequestBody OrderItemRequestDto.RequestOrderItemList requestDto){
         Long userId = requestDto.getUserId();
         //
-        ResponseOrderItemDto.FetchOrderDto fetchOrderDto = orderService.fetchOrder(userId);
+        OrderItemResponseDto.FetchOrderDto fetchOrderDto = orderService.fetchOrder(userId);
         return response.success(fetchOrderDto);
     }
 
@@ -42,13 +42,13 @@ public class OrderCustomerApiController {
      * 작성일 2022-04-07
      **/
     @PostMapping("/orders/v1/carts")
-    public ResponseEntity<?> addCartItem(@RequestBody RequestOrderItemDto.RequestItem requestItem) {
+    public ResponseEntity<?> addCartItem(@RequestBody OrderItemRequestDto.RequestItem requestItem) {
 
         Long storeId = requestItem.getStoreId();
         Long userId = requestItem.getUserId();
 
         // OrderItem DTO 생성
-        RequestOrderItemDto.OrderItemDto cartItemDto = RequestOrderItemDto.OrderItemDto.of(-1L,
+        OrderItemRequestDto.OrderItemDto cartItemDto = OrderItemRequestDto.OrderItemDto.of(-1L,
                 requestItem.getStoreId(),
                 requestItem.getItemId(),
                 requestItem.getPrice(),
@@ -66,7 +66,7 @@ public class OrderCustomerApiController {
      * 작성일 2022-04-07
      **/
     @DeleteMapping("/orders/v1/carts")
-    public ResponseEntity<?> deleteOrderItem(@RequestBody RequestOrderItemDto.RequestDeleteItem requestDeleteItem) {
+    public ResponseEntity<?> deleteOrderItem(@RequestBody OrderItemRequestDto.RequestDeleteItem requestDeleteItem) {
 
         // 장바구니에 존재하는 아이템 삭제
         // 장바구니의 크기가 0 이라면 order도 삭제
@@ -85,7 +85,7 @@ public class OrderCustomerApiController {
      * 작성일 2022-04-07
      **/
     @PatchMapping("/orders/v1/carts")
-    public ResponseEntity<?> countControl(@RequestBody RequestOrderItemDto.RequestCountItem requestCountItem) {
+    public ResponseEntity<?> countControl(@RequestBody OrderItemRequestDto.RequestCountItem requestCountItem) {
 
         Long orderItemId = requestCountItem.getOrderItemId();
         boolean plusMinus = requestCountItem.isPlusMinus();

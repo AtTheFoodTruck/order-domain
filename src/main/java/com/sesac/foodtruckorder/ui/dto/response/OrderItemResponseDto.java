@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class ResponseOrderItemDto {
+public class OrderItemResponseDto {
 
     /**
      * 장바구니 목록 조회 응답 Dto

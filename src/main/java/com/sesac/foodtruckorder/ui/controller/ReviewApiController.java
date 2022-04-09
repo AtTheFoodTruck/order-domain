@@ -3,8 +3,8 @@ package com.sesac.foodtruckorder.ui.controller;
 import com.sesac.foodtruckorder.application.service.ReviewService;
 import com.sesac.foodtruckorder.ui.dto.Helper;
 import com.sesac.foodtruckorder.ui.dto.Response;
-import com.sesac.foodtruckorder.ui.dto.request.RequestReviewDto;
-import com.sesac.foodtruckorder.ui.dto.response.ResponseReviewDto;
+import com.sesac.foodtruckorder.ui.dto.request.ReviewRequestDto;
+import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -34,12 +34,12 @@ public class ReviewApiController {
      **/
     @GetMapping("/orders/v1/reviews")
     public ResponseEntity<?> findReviews(HttpServletRequest request,
-                                         @RequestBody RequestReviewDto.RequestReviewList requestDto,
+                                         @RequestBody ReviewRequestDto.RequestReviewList requestDto,
                                          Pageable pageable) {
 
         Long userId = requestDto.getUserId();
 
-        List<ResponseReviewDto.ReviewHistoryDto> reviews = reviewService.findReviews(request, userId, pageable);
+        List<ReviewResponseDto.ReviewHistoryDto> reviews = reviewService.findReviews(request, userId, pageable);
 
         return response.success(reviews);
     }
@@ -51,7 +51,7 @@ public class ReviewApiController {
      * 작성일 2022-04-08
      **/
     @PostMapping("/orders/v1/reviews")
-    public ResponseEntity<?> createReview(@RequestBody RequestReviewDto.RequestReviewForm requestReviewForm,
+    public ResponseEntity<?> createReview(@RequestBody ReviewRequestDto.RequestReviewForm requestReviewForm,
                                           @Valid BindingResult results) {
 
         // validation check
@@ -60,7 +60,7 @@ public class ReviewApiController {
         }
 
         Long userId = requestReviewForm.getUserId();
-        RequestReviewDto.ReviewDto reviewDto = RequestReviewDto.ReviewDto.of(requestReviewForm);
+        ReviewRequestDto.ReviewDto reviewDto = ReviewRequestDto.ReviewDto.of(requestReviewForm);
 
         Long reviewId = reviewService.createReview(userId, reviewDto);
 
@@ -74,7 +74,7 @@ public class ReviewApiController {
      * 작성일 2022-04-08
      **/
     @DeleteMapping("/orders/v1/reviews")
-    public ResponseEntity<?> deleteReview(@RequestBody RequestReviewDto.DeleteReview deleteReview) {
+    public ResponseEntity<?> deleteReview(@RequestBody ReviewRequestDto.DeleteReview deleteReview) {
 
         Long userId = deleteReview.getUserId();
         Long reviewId = deleteReview.getReviewId();

@@ -9,8 +9,8 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.Orde
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.UserClient;
 import com.sesac.foodtruckorder.ui.dto.Response;
-import com.sesac.foodtruckorder.ui.dto.request.RequestOrderItemDto;
-import com.sesac.foodtruckorder.ui.dto.response.ResponseOrderItemDto;
+import com.sesac.foodtruckorder.ui.dto.request.OrderItemRequestDto;
+import com.sesac.foodtruckorder.ui.dto.response.OrderItemResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,8 +37,8 @@ public class OrderService {
      * @version 1.0.0
      * 작성일 2022-04-09
      **/
-    public ResponseOrderItemDto.FetchOrderDto fetchOrder(Long userId) {
-        return ResponseOrderItemDto.FetchOrderDto.builder().build();
+    public OrderItemResponseDto.FetchOrderDto fetchOrder(Long userId) {
+        return OrderItemResponseDto.FetchOrderDto.builder().build();
     }
 
     /**
@@ -49,7 +49,7 @@ public class OrderService {
      * 작성일 2022-04-07
      **/
     @Transactional
-    public void addItemToCart(RequestOrderItemDto.OrderItemDto cartItemDto, Long storeId, Long userId) {
+    public void addItemToCart(OrderItemRequestDto.OrderItemDto cartItemDto, Long storeId, Long userId) {
 
         // OrderItem Entity생성
         OrderItem orderItem = OrderItem.of(cartItemDto.getCartItemId(), cartItemDto.getUnitPrice(), cartItemDto.getCount());
