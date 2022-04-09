@@ -4,12 +4,12 @@ import com.sesac.foodtruckorder.application.service.OrderService;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-public class OrderCustomerController {
+public class OrderOwnerApiController {
 
     private final OrderService orderService;
     private final Response response;
@@ -21,17 +21,5 @@ public class OrderCustomerController {
      * @version 1.0.0
      * 작성일 2022/04/03
     **/
-    /*@GetMapping("/orders/v1/menu")
-    public ResponseEntity<?> getItems(@Valid @RequestBody , BindingResult results) {
-        // validation 검증
-        if (results.hasErrors()) {
-            return response.invalidFields(Helper.refineErrors(results));
-        }
-
-
-        return response.success("");
-    }*/
-
-
 
 }
