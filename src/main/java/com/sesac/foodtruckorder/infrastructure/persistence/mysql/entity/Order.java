@@ -43,10 +43,11 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "review_id")
     private Review review;
 
-    public static Order of(Long userId, Long storeId, OrderItem orderItem) {
+    public static Order of(Long userId, Long storeId, OrderStatus orderStatus, OrderItem orderItem) {
         Order order = new Order();
         order.userId = userId;
         order.storeId = storeId;
+        order.orderStatus = orderStatus;
         order.addOrderItem(orderItem);
 
         return order;
@@ -75,7 +76,7 @@ public class Order extends BaseEntity {
 
     /** 장바구니 삭제 **/
     public Order deleteOrderItem(OrderItem findOrderItem) {
-        this.orderPrice -= findOrderItem.getPrice();
+        this.orderPrice -= findOrderItem.getTotalPrice();
         this.orderItems.remove(findOrderItem);
 
         return this;
@@ -85,4 +86,14 @@ public class Order extends BaseEntity {
     public void setReview(Review review) {
         this.review = review;
     }
+
+    /** 가격 변경**/
+    public void changeOrderPrice(int plusMinus, long plusPrice) {
+        if (plusMinus > 0) {
+            this.orderPrice += plusPrice;
+        }else {
+            this.orderPrice -= plusPrice;
+        }
+    }
+
 }

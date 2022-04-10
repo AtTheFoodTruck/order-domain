@@ -33,7 +33,7 @@ public class OrderCustomerApiController {
      * @version 1.0.0
      * 작성일 2022-04-09
      **/
-    @GetMapping("/orders")
+    @GetMapping("/orders/v1/customer/carts")
     public ResponseEntity<?> fetchOrder(HttpServletRequest request,
                                         @RequestBody OrderItemRequestDto.RequestOrderItemList requestDto) {
 
@@ -50,20 +50,20 @@ public class OrderCustomerApiController {
      * @version 1.0.0
      * 작성일 2022-04-07
      **/
-    @PostMapping("/orders/v1/carts")
+    @PostMapping("/orders/v1/customer/carts")
     public ResponseEntity<?> addCartItem(@RequestBody OrderItemRequestDto.RequestItem requestItem) {
 
         Long storeId = requestItem.getStoreId();
         Long userId = requestItem.getUserId();
 
         // OrderItem DTO 생성
-        OrderItemRequestDto.OrderItemDto cartItemDto = OrderItemRequestDto.OrderItemDto.of(-1L,
+        OrderItemRequestDto.OrderItemDto orderItemDto = OrderItemRequestDto.OrderItemDto.of(-1L,
                 requestItem.getStoreId(),
                 requestItem.getItemId(),
                 requestItem.getPrice(),
                 requestItem.getCount());
 
-        orderService.addItemToCart(cartItemDto, storeId, userId);
+        orderService.addItemToCart(orderItemDto, storeId, userId);
 
         return response.success("", HttpStatus.NO_CONTENT);
     }
@@ -74,7 +74,7 @@ public class OrderCustomerApiController {
      * @version 1.0.0
      * 작성일 2022-04-07
      **/
-    @DeleteMapping("/orders/v1/carts")
+    @DeleteMapping("/orders/v1/customer/carts")
     public ResponseEntity<?> deleteOrderItem(@RequestBody OrderItemRequestDto.RequestDeleteItem requestDeleteItem) {
 
         // 장바구니에 존재하는 아이템 삭제
@@ -93,13 +93,14 @@ public class OrderCustomerApiController {
      * @version 1.0.0
      * 작성일 2022-04-07
      **/
-    @PatchMapping("/orders/v1/carts")
+    @PatchMapping("/orders/v1/customer/carts")
     public ResponseEntity<?> countControl(@RequestBody OrderItemRequestDto.RequestCountItem requestCountItem) {
 
+        Long orderId = requestCountItem.getOrderId();
         Long orderItemId = requestCountItem.getOrderItemId();
         boolean plusMinus = requestCountItem.isPlusMinus();
 
-        orderService.countControl(orderItemId, plusMinus);
+        orderService.countControl(orderId, orderItemId, plusMinus);
 
         return response.success("", HttpStatus.NO_CONTENT);
     }
@@ -110,7 +111,7 @@ public class OrderCustomerApiController {
      * @version 1.0.0
      * 작성일 2022-04-10
      **/
-    @GetMapping("/orders/v1/order")
+    @GetMapping("/orders/v1/customer/order")
     public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
                                               OrderRequestDto.RequestOrderListDto requestOrderListDto,
                                               @PageableDefault(page = 0, size = 10) Pageable pageable) {
@@ -119,6 +120,7 @@ public class OrderCustomerApiController {
 
         orderService.findOrderHistory(pageable, authorization, userId);
 
+        return response.success();
     }
     
 }

@@ -14,7 +14,7 @@ public class OrderItemRequestDto {
      **/
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
-    public class RequestOrderItemList {
+    public static class RequestOrderItemList {
         private Long userId;
     }
 
@@ -24,8 +24,9 @@ public class OrderItemRequestDto {
      * @version 1.0.0
      * 작성일 2022-04-07
      **/
+    @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
-    public class RequestItem {
+    public static class RequestItem {
         private Long itemId;    // 상품ID
         private int price;      // 상품 가격
         private int count;      // 상품 수량
@@ -46,7 +47,7 @@ public class OrderItemRequestDto {
     @AllArgsConstructor
     @Builder
     public static class OrderItemDto {
-        private Long cartItemId;    // cartItem ID
+        private Long orderItemId;    // cartItem ID
         private Long storeId;       // 가게 ID
         private Long itemId;        // 상품 ID
         private int count;          // 상품 수량
@@ -54,10 +55,10 @@ public class OrderItemRequestDto {
 //        private String itemName;    // 상품 Name
 
         // cartItem_id, item_id, price, count
-        public static OrderItemDto of(Long cartItemId, Long storeId, Long itemId,
+        public static OrderItemDto of(Long orderItemId, Long storeId, Long itemId,
                                       int unitPrice, int count) {
             OrderItemDto orderItemDto = new OrderItemDto();
-            orderItemDto.cartItemId = cartItemId;
+            orderItemDto.orderItemId = orderItemId;
             orderItemDto.storeId = storeId;
             orderItemDto.itemId = itemId;
             orderItemDto.unitPrice = unitPrice;
@@ -89,6 +90,7 @@ public class OrderItemRequestDto {
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
     public static class RequestCountItem {
+        private Long orderId;
         private Long orderItemId;
         private boolean plusMinus;
     }
