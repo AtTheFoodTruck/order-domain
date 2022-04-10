@@ -19,7 +19,7 @@ public class OrderResponseDto {
         private String storeName;		    // 가게 이름
         private long totalPrice;		    // 총 주문 가격
         private LocalDateTime orderDate;    // 주문 날짜
-        private List<_OrderItems> orders;   // 아이템 목록
+//        private List<_OrderItems> orders;   // 아이템 목록
         // 대기번호
     }
 }

@@ -110,15 +110,15 @@ public class OrderCustomerApiController {
      * @version 1.0.0
      * 작성일 2022-04-10
      **/
-    @GetMapping("/orders/v1/order")
-    public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
-                                              OrderRequestDto.RequestOrderListDto requestOrderListDto,
-                                              @PageableDefault(page = 0, size = 10) Pageable pageable) {
-        String authorization = request.getHeader("Authorization");
-        Long userId = requestOrderListDto.getUserId();
-
-        orderService.findOrderHistory(pageable, authorization, userId);
-
-    }
+//    @GetMapping("/orders/v1/order")
+//    public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
+//                                              OrderRequestDto.RequestOrderListDto requestOrderListDto,
+//                                              @PageableDefault(page = 0, size = 10) Pageable pageable) {
+//        String authorization = request.getHeader("Authorization");
+//        Long userId = requestOrderListDto.getUserId();
+//
+//        orderService.findOrderHistory(pageable, authorization, userId);
+//
+//    }
     
 }
