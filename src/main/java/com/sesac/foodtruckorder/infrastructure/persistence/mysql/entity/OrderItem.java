@@ -46,7 +46,8 @@ public class OrderItem extends BaseEntity {
     }
 
     /** 상품 수량 증가 **/
-    public void plusMinus(OrderItem orderItem) {
-
+    public void changeCount(int count) {
+        this.count = count;
     }
+
 }

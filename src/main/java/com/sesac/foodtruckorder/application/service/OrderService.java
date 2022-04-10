@@ -15,6 +15,7 @@ import com.sesac.foodtruckorder.ui.dto.request.OrderItemRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderItemResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,10 +91,10 @@ public class OrderService {
      * 작성일 2022-04-07
      **/
     @Transactional
-    public void addItemToCart(OrderItemRequestDto.OrderItemDto cartItemDto, Long storeId, Long userId) {
+    public void addItemToCart(OrderItemRequestDto.OrderItemDto orderItemDto, Long storeId, Long userId) {
 
         // OrderItem Entity생성
-        OrderItem orderItem = OrderItem.of(cartItemDto.getCartItemId(), cartItemDto.getUnitPrice(), cartItemDto.getCount());
+        OrderItem orderItem = OrderItem.of(orderItemDto.getItemId(), orderItemDto.getUnitPrice(), orderItemDto.getCount());
 
         // 사용자에게 장바구니가 2개이상인지 체크
         Long cartStatus = orderRepository.countByUserIdAndOrderStatus(userId, OrderStatus.PENDING);
@@ -111,7 +112,7 @@ public class OrderService {
             }
         } else {
             // 5. 같다면 장바구니에 아이템 저장
-            orderRepository.save(Order.of(userId, storeId, orderItem));
+            orderRepository.save(Order.of(userId, storeId, OrderStatus.PENDING, orderItem));
         }
     }
 
@@ -122,17 +123,30 @@ public class OrderService {
      * 작성일 2022-04-07
      **/
     @Transactional
-    public void countControl(Long orderItemId, boolean plusMinus) {
+    public void countControl(Long orderId, Long orderItemId, boolean plusMinus) {
 
-        // OrderItem 조회
-        OrderItem plusOrderItem = orderItemRepository.findById(orderItemId).get();
-        int plusCount = plusOrderItem.getCount();
+        Order findOrder = orderRepository.findById(orderId).get();
+        OrderItem findOrderItem = findOrder.getOrderItems().stream()
+                .filter(orderItem -> orderItem.getId().equals(orderItemId))
+                .findFirst().get();
 
-        if (plusMinus) {
-            plusCount++;
-        } else {
-            plusCount--;
-        }
+        long price = findOrderItem.getPrice();
+        int count = findOrderItem.getCount();
+
+        int cal = (plusMinus == true) ? 1 : -1;
+
+        getCount(cal, findOrder, findOrderItem, price, count);
+    }
+
+    private void getCount(int cal, Order findOrder, OrderItem findOrderItem, long price, int count) {
+        count += cal;
+        long plusPrice = price * 1;
+        findOrderItem.changeCount(count);
+        findOrder.changeOrderPrice(cal, plusPrice);
+    }
+
+    public void findOrderHistory(Pageable pageable, String authorization, Long userId) {
+
     }
 }
 
