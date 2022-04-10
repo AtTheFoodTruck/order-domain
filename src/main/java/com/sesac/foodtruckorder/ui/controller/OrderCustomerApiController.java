@@ -4,9 +4,12 @@ import com.sesac.foodtruckorder.application.service.OrderItemService;
 import com.sesac.foodtruckorder.application.service.OrderService;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.OrderItemRequestDto;
+import com.sesac.foodtruckorder.ui.dto.request.OrderRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderItemResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -101,4 +104,21 @@ public class OrderCustomerApiController {
         return response.success("", HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * 주문 내역 조회
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022-04-10
+     **/
+    @GetMapping("/orders/v1/order")
+    public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
+                                              OrderRequestDto.RequestOrderListDto requestOrderListDto,
+                                              @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        String authorization = request.getHeader("Authorization");
+        Long userId = requestOrderListDto.getUserId();
+
+        orderService.findOrderHistory(pageable, authorization, userId);
+
+    }
+    
 }

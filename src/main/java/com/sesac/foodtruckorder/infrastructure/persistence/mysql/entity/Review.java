@@ -30,7 +30,7 @@ public class Review extends BaseEntity {
     private Long storeId;
 
     // order
-    @OneToOne(fetch = LAZY, mappedBy = "order_id")
+    @OneToOne(fetch = LAZY, mappedBy = "review")
     private Order order;
 
     /** 생성 메서드 **/
