@@ -145,6 +145,12 @@ public class OrderService {
         findOrder.changeOrderPrice(cal, plusPrice);
     }
 
+    /**
+     * 주문 내역 조회
+     * @author jjaen
+     * @version 1.0.0
+     * 작성일 2022/04/11
+    **/
     public void findOrderHistory(Pageable pageable, String authorization, Long userId) {
 
     }
