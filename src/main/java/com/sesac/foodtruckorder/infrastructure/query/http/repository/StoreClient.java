@@ -3,6 +3,7 @@ package com.sesac.foodtruckorder.infrastructure.query.http.repository;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetItemsInfoDto;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.global.Result;
+import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,7 @@ public interface StoreClient {
 
     /**
      * 장바구니 내역 조회, 아이템 정보 조회
+     * itemId, itemName
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022/04/11
@@ -47,6 +49,16 @@ public interface StoreClient {
     @GetMapping("/items/v1/item/{itemId}")
     Result<List<GetItemsInfoDto>> getItem(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
                                           @PathVariable("itemId") Iterable<Long> itemIds);
+
+    /**
+     * 가게 정보 조회
+     * using by 주문 조회 페이지 (점주)
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/11
+     **/
+    @GetMapping("/items/v1/store/{userId}")
+    Result<OrderResponseDto.GetStoreInfoByUserId> getStoreInfoByUserId(String authorization, Long userId);
 
 
     /**
@@ -90,6 +102,8 @@ public interface StoreClient {
                                 getStoreResponse -> getStoreResponse.getImgUrl())
                 );
     }
+
+
 
     /**
      * 아이템 정보 조회

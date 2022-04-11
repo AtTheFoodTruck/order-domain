@@ -13,6 +13,7 @@ import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.UserClient;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.OrderItemRequestDto;
+import com.sesac.foodtruckorder.ui.dto.request.OrderRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderItemResponseDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -144,7 +146,7 @@ public class OrderService {
     }
 
     /**
-     * 주문 내역 조회
+     * 주문 내역 조회 (사용자)
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022/04/11
@@ -186,6 +188,60 @@ public class OrderService {
         }
 
         return orderHistoryList;
+    }
+
+    /**
+     * 주문 조회 페이지 (점주)
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/11
+    **/
+    public OrderResponseDto.OrderMainDto findOrderMainPage(HttpServletRequest request, OrderRequestDto.OrderSearchCondition condition, Pageable pageable) {
+        String authorization = request.getHeader("Authorization");
+
+        Long userId = condition.getUserId();
+        LocalDateTime start = condition.getOrderStartTime(); // 영업 시작 시간
+        LocalDateTime end = condition.getOrderEndTime();//영업 종료 시간
+
+        // 가게 정보 조회
+        OrderResponseDto.GetStoreInfoByUserId storeInfo = storeClient.getStoreInfoByUserId(authorization, condition.getUserId()).getData();
+
+        // 주문 정보 조회
+        List<Order> findOrders = orderRepository.findOrderMainPage(start, end, storeInfo.getStoreId(), OrderStatus.PENDING, pageable).getContent();
+
+        // 사용자 정보, 아이템 정보 조회
+        Set<Long> userIds = new HashSet<>();
+        Set<Long> itemIds = new HashSet<>();
+
+        OrderResponseDto.OrderMainDto returnDto = OrderResponseDto.OrderMainDto.of(findOrders);
+        List<OrderResponseDto._Order> orders = returnDto.getOrders();
+
+        // userId, ItemId set에 추가
+        for (OrderResponseDto._Order order : orders) {
+            userIds.add(order.getUserId());
+            for (OrderResponseDto._OrderItem orderItem : order.getOrderItems()) {
+                itemIds.add(orderItem.getItemId());
+            }
+        }
+
+        // user name 조회, dto에 추가
+        Map<Long, String> userNameMap = userClient.getUserNameMap(authorization, userIds);
+
+        // item name 조회, dto에 추가
+        Map<Long, String> itemMap = storeClient.getItem(authorization, itemIds).getData().stream()
+                .collect(
+                        Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(), getItemsInfoDto -> getItemsInfoDto.getItemName())
+                );
+
+        for (OrderResponseDto._Order order : orders) {
+            order.changeUserName(userNameMap.get(order.getUserId()));
+            for (OrderResponseDto._OrderItem orderItem : order.getOrderItems()) {
+                orderItem.changeItemName(itemMap.get(orderItem.getItemId()));
+            }
+        }
+
+        return returnDto;
+
     }
 }
 

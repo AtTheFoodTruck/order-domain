@@ -77,4 +77,110 @@ public class OrderResponseDto {
         }
     }
 
+    /**
+     * OrderResponseDto 의 설명 적기
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/11
+     **/
+    @Data
+    public static class GetStoreInfoByUserId {
+        private Long storeId;
+        private String storeName;
+    }
+
+    /**
+     * OrderMainDto
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/12
+    **/
+    @Data
+    public static class OrderMainDto{
+        private List<_Order> orders;
+
+        public static OrderMainDto of(List<Order> orders) {
+            OrderMainDto orderMainDto = new OrderMainDto();
+            List<_Order> orderList = orders.stream().
+                    map(order -> _Order.of(order))
+                    .collect(Collectors.toList());
+
+            orderMainDto.orders = orderList;
+
+            return orderMainDto;
+        }
+    }
+
+    /**
+     * OrderMainDto - List<Order> dto
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/12
+    **/
+    @Data
+    public static class _Order {
+        private Long orderId;
+        private Long userId;
+        private OrderStatus orderStatus;
+        private LocalDateTime orderTime;
+        private List<_OrderItem> orderItems;
+        private String userName;
+
+        public static _Order of(Order order) {
+            _Order orderDto = new _Order();
+            orderDto.orderId = order.getId();
+            orderDto.userId = order.getUserId();
+            orderDto.orderStatus = order.getOrderStatus();
+            orderDto.orderTime = order.getOrderTime();
+            orderDto.orderItems = order.getOrderItems().stream()
+                    .map(orderItem -> _OrderItem.of(orderItem))
+                    .collect(Collectors.toList());
+
+            return orderDto;
+        }
+
+        public void changeUserName(String userName) {
+            this.userName = userName;
+        }
+    }
+
+    /**
+     * OrderMainDto - List<_Order> - List<_OrderItem>
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/12
+    **/
+    @Data
+    public static class _OrderItem {
+        private Long orderItemId;
+        private Long itemId;
+        private String itemName;
+
+        public static _OrderItem of(OrderItem orderItem) {
+            _OrderItem orderItemDto = new _OrderItem();
+            orderItemDto.orderItemId = orderItem.getId();
+            orderItemDto.itemId = orderItem.getItemId();
+
+            return orderItemDto;
+        }
+
+        public void changeItemName(String itemName) {
+            this.itemName = itemName;
+        }
+    }
+
+    /**
+     * feign client with user Domain - 유저 정보 조회
+     * userId, userName
+     * @author
+     * @version 1.0.0
+     * 작성일 2022/04/12
+    **/
+    @Data
+    public static class GetUserNameMap {
+        private Long userId;
+        private String userName;
+    }
+
+
 }
