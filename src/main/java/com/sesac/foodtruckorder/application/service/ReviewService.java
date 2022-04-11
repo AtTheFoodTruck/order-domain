@@ -35,7 +35,7 @@ public class ReviewService {
     private final StoreClient storeClient;
 
     /**
-     * Review 목록 조회
+     * Review 목록 조회 - 사용자
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022-04-08
@@ -60,13 +60,16 @@ public class ReviewService {
             storeIds.add(reviewHistoryDto.getStoreId());
         }
 
-        // 5. Map을 받아올건데, storeClient Map<id, storeName>, Map<id, image> => 여러개
-        Map<Long, String> storeInfoMap = storeClient.getStoreInfoMap(request, storeIds);
+        // 5. Map을 받아올건데, storeClient Map<id, storeName>
+        Map<Long, String> storeInfoMap = storeClient.getStoreInfoMap(request, storeIds);        // 가게 정보 조회(StoreName)
+        Map<Long, String> storeImgaeMap = storeClient.getStoreImageInfoMap(request, storeIds);  // 가게 정보 조회(StoreImageUrl)
 
         // 6. for문 돌면서 dto에 value인 Name을 업데이트해줘야돼
         for (ReviewResponseDto.ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
             String storeName = storeInfoMap.get(reviewHistoryDto.getStoreId());
+            String storeImgUrl = storeImgaeMap.get(reviewHistoryDto.getStoreId());
             reviewHistoryDto.changeStoreName(storeName);
+            reviewHistoryDto.changeStoreImgUrl(storeImgUrl);
         }
 
         return reviewHistoryDtoList;
