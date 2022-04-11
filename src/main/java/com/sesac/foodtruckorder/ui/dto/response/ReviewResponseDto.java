@@ -41,6 +41,10 @@ public class ReviewResponseDto {
         public void changeStoreName(String storeName) {
             this.storeName = storeName;
         }
+
+        public void changeStoreImgUrl(String storeImgUrl) {
+            this.storeImgUrl = storeImgUrl;
+        }
     }
 
 }

@@ -8,24 +8,23 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.Orde
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepository;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetItemsInfoDto;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.global.Result;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.UserClient;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.OrderItemRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderItemResponseDto;
+import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +37,6 @@ public class OrderService {
     private final Response response;
     private final UserClient userClient;
     private final StoreClient storeClient;
-
 
     /**
      * 장바구니 목록 조회
@@ -145,8 +143,49 @@ public class OrderService {
         findOrder.changeOrderPrice(cal, plusPrice);
     }
 
-    public void findOrderHistory(Pageable pageable, String authorization, Long userId) {
+    /**
+     * 주문 내역 조회
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/11
+    **/
+    public List<OrderResponseDto.OrderHistory> findOrderHistory(Pageable pageable, HttpServletRequest request, Long userId) {
+        String authorization = request.getHeader("Authorization");
+        // 주문 정보 조회 - 페이징
+        Page<Order> findOrder = orderRepository.findByUserIdAndPaging(pageable, userId, OrderStatus.PENDING);
 
+        // 주문 정보 dto 변환
+        List<OrderResponseDto.OrderHistory> orderHistoryList = findOrder.getContent().stream()
+                .map(order -> OrderResponseDto.OrderHistory.of(order))
+                .collect(Collectors.toList());
+
+        Set<Long> storeIds = new HashSet<>();
+        Set<Long> itemIds = new HashSet<>();
+
+        // 주문한 storeId, itemId set객체에 저장
+        for (OrderResponseDto.OrderHistory orderHistory : orderHistoryList) {
+            storeIds.add(orderHistory.getStoreId());
+            for (OrderResponseDto._OrderItems orderItems : orderHistory.getOrderItems()) {
+                itemIds.add(orderItems.getItemId());
+            }
+        }
+
+        // store, item 정보 추출, storeName, itemName
+        Map<Long, String> storeNameMap = storeClient.getStoreInfoMap(request, storeIds);            // 가게 정보 조회(StoreName)
+        Map<Long, String> storeImgaeMap = storeClient.getStoreImageInfoMap(request, storeIds);      // 가게 정보 조회(StoreImageUrl)
+        Result<List<GetItemsInfoDto>> itemNameMap = storeClient.getItem(authorization, itemIds);    // 아이템 정보 조회(itemName)
+
+        for (OrderResponseDto.OrderHistory orderHistory : orderHistoryList) {
+            String storeName = storeNameMap.get(orderHistory.getStoreId());
+            String storeImgUrl = storeImgaeMap.get(orderHistory.getStoreId());
+            orderHistory.changeStoreName(storeName);
+            orderHistory.changeStoreImgUrl(storeImgUrl);
+            for (OrderResponseDto._OrderItems orderItems : orderHistory.getOrderItems()) {
+                orderItems.changeItemName(orderItems.getItemName());
+            }
+        }
+
+        return orderHistoryList;
     }
 }
 

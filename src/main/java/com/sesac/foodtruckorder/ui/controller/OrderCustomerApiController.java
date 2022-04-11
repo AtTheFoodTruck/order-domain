@@ -6,6 +6,7 @@ import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.OrderItemRequestDto;
 import com.sesac.foodtruckorder.ui.dto.request.OrderRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderItemResponseDto;
+import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -115,12 +116,11 @@ public class OrderCustomerApiController {
     public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
                                               OrderRequestDto.RequestOrderListDto requestOrderListDto,
                                               @PageableDefault(page = 0, size = 10) Pageable pageable) {
-        String authorization = request.getHeader("Authorization");
         Long userId = requestOrderListDto.getUserId();
 
-        orderService.findOrderHistory(pageable, authorization, userId);
+        List<OrderResponseDto.OrderHistory> orderHistory = orderService.findOrderHistory(pageable, request, userId);
 
-        return response.success();
+        return response.success(orderHistory);
     }
     
 }
