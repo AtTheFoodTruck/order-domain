@@ -36,8 +36,7 @@ public class OrderOwnerApiController {
     private final Response response;
 
     /**
-     * 점주 입장) 메뉴 조회
-     * : 메뉴 관리 페이지
+     * 점주) 주문 조회 페이지
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022/04/03
@@ -191,4 +190,19 @@ public class OrderOwnerApiController {
     }
     /*******************************************************************************************************************/
     /** Dto 끝 **/
+
+    /**
+     * 주문 상세 보기
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/12
+     **/
+    @GetMapping("/orders/v1/owner/order-detail")
+    public ResponseEntity<?> getOrderDetail(HttpServletRequest request,
+                                            @RequestBody OrderRequestDto.OrderDetailSearch orderDetailSearch) {
+
+        OrderResponseDto.OrderDetailDto orderDetail = orderService.findOrderDetail(request, orderDetailSearch);
+
+        return response.success(orderDetail);
+    }
 }

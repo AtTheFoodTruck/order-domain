@@ -3,8 +3,7 @@ package com.sesac.foodtruckorder.ui.dto.response;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Order;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderItem;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderStatus;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -218,6 +217,84 @@ public class OrderResponseDto {
             public void changeItemName(String itemName) {
                 this.itemName = itemName;
             }
+        }
+    }
+
+    /**
+     * 이전 내역 조회 dto
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/12
+     **/
+    @Data
+    public static class OrderDetailDto {
+        private Long orderId;
+        private LocalDateTime orderTime;
+        private OrderStatus orderStatus;
+        private String storeName;
+        private OrderDetailUser user;
+        private List<OrderDetailItem> orderItems;
+
+        public static OrderDetailDto of(Order order,
+                                        String storeName,
+                                        OrderDetailUser user,
+                                        List<OrderDetailItem> orderItems) {
+            OrderDetailDto orderDetailDto = new OrderDetailDto();
+            orderDetailDto.orderId = order.getId();
+            orderDetailDto.orderTime = order.getOrderTime();
+            orderDetailDto.orderStatus = order.getOrderStatus();
+            orderDetailDto.storeName = storeName;
+            orderDetailDto.user = user;
+            orderDetailDto.orderItems = orderItems;
+
+            return orderDetailDto;
+        }
+    }
+
+    @Data @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class OrderDetailUser {
+        private Long userId;
+        private String userName;
+        private String phoneNum;
+
+        @Builder
+        public OrderDetailUser(Long userId, String userName, String phoneNum) {
+            this.userId = userId;
+            this.userName = userName;
+            this.phoneNum = phoneNum;
+        }
+    }
+
+    @Data @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class OrderDetailItem {
+        private Long orderItemId;
+        private Long itemId;
+        private String itemName;
+        private long totalPrice;
+        private int count;
+
+        @Builder
+        public OrderDetailItem(Long orderItemId, Long itemId, String itemName, long totalPrice, int count) {
+            this.orderItemId = orderItemId;
+            this.itemId = itemId;
+            this.itemName = itemName;
+            this.totalPrice = totalPrice;
+            this.count = count;
+        }
+
+        // 생성 메서드
+        public static OrderDetailItem of(OrderItem orderItem) {
+            OrderDetailItem orderDetailItem = new OrderDetailItem();
+            orderDetailItem.orderItemId = orderItem.getId();
+            orderDetailItem.itemId = orderItem.getItemId();
+            orderDetailItem.totalPrice = orderItem.getTotalPrice();
+            orderDetailItem.count = orderItem.getCount();
+
+            return orderDetailItem;
+        }
+
+        public void changeItemName(String itemName) {
+            this.itemName = itemName;
         }
     }
 

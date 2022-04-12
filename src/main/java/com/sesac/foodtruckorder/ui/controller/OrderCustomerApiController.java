@@ -122,5 +122,20 @@ public class OrderCustomerApiController {
 
         return response.success(orderHistory);
     }
+
+    /**
+     * 주문 생성
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/13
+     **/
+    @PostMapping("/orders/v1/customer/order")
+    public ResponseEntity<?> saveOrder(@RequestBody OrderRequestDto.RequestOrderListDto requestOrderListDto) {
+        Long userId = requestOrderListDto.getUserId();
+
+        orderService.saveOrder(userId);
+
+        return response.success("", HttpStatus.CREATED);
+    }
     
 }

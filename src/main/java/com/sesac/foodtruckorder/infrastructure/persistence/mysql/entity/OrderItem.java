@@ -17,7 +17,7 @@ public class OrderItem extends BaseEntity {
     @Column(name = "orderItem_id")
     private Long id;        // OrderItem_id
     private Long itemId;    // Item_id
-    private int price;      // 주문 가격
+    private long price;      // 주문 가격
     private int count;      // 주문 수량
 
     // Order
@@ -31,7 +31,7 @@ public class OrderItem extends BaseEntity {
     }
 
     /** 생성 메서드 **/
-    public static OrderItem of(Long itemId, int price, int count) {
+    public static OrderItem of(Long itemId, long price, int count) {
         OrderItem orderItem = new OrderItem();
         orderItem.itemId = itemId;
         orderItem.price = price;

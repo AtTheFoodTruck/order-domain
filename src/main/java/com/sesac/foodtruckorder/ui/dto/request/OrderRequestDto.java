@@ -85,4 +85,15 @@ public class OrderRequestDto {
         }
     }
 
+    /**
+     * 주문 상세 내역 조회(점주)
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/12
+    **/
+    @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Data
+    public static class OrderDetailSearch {
+        private Long orderId;
+    }
 }

@@ -96,4 +96,9 @@ public class Order extends BaseEntity {
         }
     }
 
+    /** 주문 상태 변경 **/
+    public void changeOrderStatus() {
+        this.orderStatus = OrderStatus.ORDER;
+    }
+
 }

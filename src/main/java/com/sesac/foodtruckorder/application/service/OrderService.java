@@ -6,10 +6,7 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderIte
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderStatus;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderItemRepository;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepository;
-import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetItemsInfoDto;
-import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
-import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreInfoByUserId;
-import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetUserNameMap;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.*;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.global.Result;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.UserClient;
@@ -295,6 +292,61 @@ public class OrderService {
 
         return prevOrderList;
     }
+
+    /**
+     * 주문 상세 내역 조회
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/12
+    **/
+    public OrderResponseDto.OrderDetailDto findOrderDetail(HttpServletRequest request, OrderRequestDto.OrderDetailSearch orderDetailSearch) {
+        String authorization = request.getHeader("Authorization");
+        Long orderId = orderDetailSearch.getOrderId();
+
+        Order findOrder = orderRepository.findById(orderId).orElseThrow(
+                () -> new OrderException(orderId + "는 없는 주문 번호입니다")
+        );
+        Long userId = findOrder.getUserId();
+        // ItemId 수집
+        Set<Long> items = new HashSet<>();
+        for (OrderItem orderItem : findOrder.getOrderItems()) {
+            items.add(orderItem.getItemId());
+        }
+
+        Map<Long, String> itemInfoMap = storeClient.getItemInfoMap(request, items);
+
+        // feign client - store domain
+        String storeName = storeClient.getStoreInfoByUserId(authorization, userId).getData().getStoreName();
+
+        // feign client - user domain, 주문 고객 조회 용
+        CreateUserDto createUserDto = userClient.userInfo(authorization, findOrder.getUserId());
+        OrderResponseDto.OrderDetailUser orderDetailUser =
+                new OrderResponseDto.OrderDetailUser(createUserDto.getUserId(), createUserDto.getUsername(), createUserDto.getPhoneNum());
+
+        List<OrderResponseDto.OrderDetailItem> orderDetailItems = new ArrayList<>();
+
+        for (OrderItem orderItem :findOrder.getOrderItems()) {
+            OrderResponseDto.OrderDetailItem detailItem = OrderResponseDto.OrderDetailItem.of(orderItem);
+            detailItem.changeItemName(itemInfoMap.get(detailItem.getItemId()));
+
+            orderDetailItems.add(detailItem);
+        }
+
+        return OrderResponseDto.OrderDetailDto.of(findOrder, storeName, orderDetailUser, orderDetailItems);
+    }
+
+    /**
+     * 주문 생성
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/13
+    **/
+    public void saveOrder(Long userId) {
+        orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.PENDING).orElseThrow(
+                () -> new OrderException("장바구니 정보를 찾을 수 없습니다.")
+        ).changeOrderStatus();
+    }
 }
+
 
 
