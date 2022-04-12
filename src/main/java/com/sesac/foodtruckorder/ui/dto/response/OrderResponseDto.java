@@ -3,6 +3,7 @@ package com.sesac.foodtruckorder.ui.dto.response;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Order;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderItem;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderStatus;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,7 @@ public class OrderResponseDto {
         private List<_OrderItems> orderItems;   // 아이템 목록
         // 대기번호
 
+        // 생성 메서드
         public static OrderHistory of(Order order) {
             OrderHistory orderHistory = new OrderHistory();
             orderHistory.orderId = order.getId();
@@ -64,6 +66,7 @@ public class OrderResponseDto {
         private Long itemId;
         private String itemName;
 
+        // 생성 메서드
         public static _OrderItems of(OrderItem orderItem) {
             _OrderItems orderItems = new _OrderItems();
             orderItems.orderItemId = orderItem.getId();
@@ -77,17 +80,7 @@ public class OrderResponseDto {
         }
     }
 
-    /**
-     * OrderResponseDto 의 설명 적기
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/11
-     **/
-    @Data
-    public static class GetStoreInfoByUserId {
-        private Long storeId;
-        private String storeName;
-    }
+
 
     /**
      * OrderMainDto
@@ -126,6 +119,7 @@ public class OrderResponseDto {
         private List<_OrderItem> orderItems;
         private String userName;
 
+        // 생성 메서드
         public static _Order of(Order order) {
             _Order orderDto = new _Order();
             orderDto.orderId = order.getId();
@@ -170,17 +164,61 @@ public class OrderResponseDto {
     }
 
     /**
-     * feign client with user Domain - 유저 정보 조회
-     * userId, userName
-     * @author
+     * 이전 주문 내역 조회
+     *
+     * @author jaemin
      * @version 1.0.0
      * 작성일 2022/04/12
-    **/
+     **/
     @Data
-    public static class GetUserNameMap {
+    public static class PrevOrderDto {
+        private Long orderId;
+        private OrderStatus orderStatus;
+        private LocalDateTime orderTime;
+        private long orderPrice;
         private Long userId;
         private String userName;
-    }
 
+        private List<_PrevOrderItem> prevOrderItems;
+
+        // 생성 메서드
+        public static PrevOrderDto of(Order order) {
+            PrevOrderDto prevOrderDto = new PrevOrderDto();
+            prevOrderDto.orderId = order.getId();
+            prevOrderDto.orderStatus = order.getOrderStatus();
+            prevOrderDto.orderTime = order.getOrderTime();
+            prevOrderDto.orderPrice = order.getOrderPrice();
+            prevOrderDto.userId = order.getUserId();
+
+            prevOrderDto.prevOrderItems = order.getOrderItems().stream()
+                    .map(orderItem -> _PrevOrderItem.of(orderItem))
+                    .collect(Collectors.toList());
+            return prevOrderDto;
+        }
+
+        public void changeUserName(String userName) {
+            this.userName = userName;
+        }
+
+        @Data
+        public static class _PrevOrderItem {
+            private Long orderItemId;
+            private Long itemId;
+            private String itemName;
+
+            // 생성 메서드
+            public static _PrevOrderItem of(OrderItem orderItem) {
+                _PrevOrderItem prevOrderItem = new _PrevOrderItem();
+                prevOrderItem.orderItemId = orderItem.getId();
+                prevOrderItem.itemId = orderItem.getItemId();
+
+                return prevOrderItem;
+            }
+
+            public void changeItemName(String itemName) {
+                this.itemName = itemName;
+            }
+        }
+    }
 
 }
