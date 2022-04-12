@@ -1,5 +1,6 @@
 package com.sesac.foodtruckorder.infrastructure.query.http.repository;
 
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.CreateUserDto;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetUserNameMap;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.global.Result;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -34,4 +35,14 @@ public interface UserClient {
                 );
 
     }
+
+    /**
+     * User Domain에서 user정보 받아오기
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022-04-09
+     **/
+    @GetMapping("/users/info/{userId}")
+    CreateUserDto userInfo(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
+                           @PathVariable("userId") Long userId);
 }
