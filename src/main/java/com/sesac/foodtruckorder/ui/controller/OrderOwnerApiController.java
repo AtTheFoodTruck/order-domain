@@ -1,6 +1,8 @@
 package com.sesac.foodtruckorder.ui.controller;
 
 import com.sesac.foodtruckorder.application.service.OrderService;
+import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderStatus;
+import com.sesac.foodtruckorder.ui.dto.Helper;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.OrderRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
@@ -9,12 +11,18 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,6 +55,7 @@ public class OrderOwnerApiController {
         return response.success(orderMainResponse);
     }
 
+    /** Dto 시작 **/
     /*******************************************************************************************************************/
     /**
      * 주문 조회 페이지(점주) 화면에 fit한 dto 생성
@@ -105,6 +114,81 @@ public class OrderOwnerApiController {
         }
     }
     /*******************************************************************************************************************/
+    /** Dto 끝 **/
 
+    /**
+     * 이전 주문 내역 조회
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/12
+     **/
+    @GetMapping("/orders/v1/owner/prev/order")
+    public ResponseEntity<?> getPrevOrderList(HttpServletRequest request,
+                                              @Valid @RequestBody OrderRequestDto.PrevOrderSearch prevOrderSearch,
+                                              BindingResult results,
+                                              @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        // validation check
+        if (results.hasErrors()) {
+            response.invalidFields(Helper.refineErrors(results));
+        }
 
+        // 시작일, 종료일 validation check
+        LocalDate startDate = prevOrderSearch.getStartDate();
+        LocalDate endDate = prevOrderSearch.getEndDate();
+
+        if (startDate.isAfter(endDate)) {
+            response.fail("시작일은 종료일보다 클 수 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        List<OrderResponseDto.PrevOrderDto> prevOrderList = orderService.findPrevOrderList(request, prevOrderSearch, pageable);
+
+        // orderId, orderStatus, orderTime, orderItemId, itemName, orderTotalPrice, userName
+        PrevOrderResponse prevOrderResponse = new PrevOrderResponse(prevOrderList);
+
+        return response.success(prevOrderResponse);
+    }
+    /** Dto 시작 **/
+    /*******************************************************************************************************************/
+
+    static class PrevOrderResponse {
+        private List<_Order> orders;
+
+        public PrevOrderResponse(List<OrderResponseDto.PrevOrderDto> prevOrderdtoList) {
+            this.orders = prevOrderdtoList.stream().map(orders -> new _Order(orders)).collect(Collectors.toList());
+        }
+
+        static class _Order {
+            private Long orderId;
+            private OrderStatus orderStatus;
+            private LocalDateTime orderTime;
+            private long orderPrice;
+            private String userName;
+            private List<_OrderItem> orderItems;
+
+            public _Order(OrderResponseDto.PrevOrderDto orders) {
+                this.orderId = orders.getOrderId();
+                this.orderStatus = orders.getOrderStatus();
+                this.orderTime = orders.getOrderTime();
+                this.orderPrice = orders.getOrderPrice();
+                this.userName = orders.getUserName();
+                orderItems = orders.getPrevOrderItems().stream().map(
+                        prevOrderItem -> new _OrderItem(prevOrderItem)
+                ).collect(Collectors.toList());
+            }
+
+            static class _OrderItem {
+                private Long orderItemId;
+                private String itemName;
+
+                public _OrderItem(OrderResponseDto.PrevOrderDto._PrevOrderItem prevOrderItem) {
+                    this.orderItemId = prevOrderItem.getOrderItemId();
+                    this.itemName = prevOrderItem.getItemName();
+                }
+            }
+
+        }
+
+    }
+    /*******************************************************************************************************************/
+    /** Dto 끝 **/
 }

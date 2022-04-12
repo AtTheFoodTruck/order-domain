@@ -28,6 +28,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("select o from Order o where o.storeId=:storeId and o.orderTime between :start and :end and o.orderStatus <> :orderStatus order by o.id desc")
     Slice<Order> findOrderMainPage(LocalDateTime start, LocalDateTime end, Long storeId, OrderStatus orderStatus, Pageable pageable);
 
+    @Query("select o from Order o where o.storeId=:storeId and o.orderTime between :start and :end and o.orderStatus <> :orderStatus order by o.orderTime desc")
+    Page<Order> findByStoreId(LocalDateTime start, LocalDateTime end, Long storeId, OrderStatus orderStatus, Pageable pageable);
+
 //    @Query("select o from Order o where o.userId=:userId and o.orderStatus=:orderStatus")
 //    Page<Order> findByReviews(Pageable pageable, Long userId, OrderStatus orderStatus);
 }

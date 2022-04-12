@@ -8,6 +8,8 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.Orde
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepository;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetItemsInfoDto;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreInfoByUserId;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetUserNameMap;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.global.Result;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.UserClient;
@@ -204,9 +206,9 @@ public class OrderService {
         LocalDateTime end = condition.getOrderEndTime();//영업 종료 시간
 
         // 가게 정보 조회
-        OrderResponseDto.GetStoreInfoByUserId storeInfo = storeClient.getStoreInfoByUserId(authorization, condition.getUserId()).getData();
+        GetStoreInfoByUserId storeInfo = storeClient.getStoreInfoByUserId(authorization, userId).getData();
 
-        // 주문 정보 조회
+        // 주문 정보 조회 -> Slice
         List<Order> findOrders = orderRepository.findOrderMainPage(start, end, storeInfo.getStoreId(), OrderStatus.PENDING, pageable).getContent();
 
         // 사용자 정보, 아이템 정보 조회
@@ -242,6 +244,56 @@ public class OrderService {
 
         return returnDto;
 
+    }
+
+    /**
+     * 이전 주문 내역 조회(점주)
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/12
+    **/
+    public List<OrderResponseDto.PrevOrderDto> findPrevOrderList(HttpServletRequest request,
+                                                           OrderRequestDto.PrevOrderSearch prevOrderSearch,
+                                                           Pageable pageable) {
+        String authorization = request.getHeader("Authorization");
+        Long userId = prevOrderSearch.getUserId();
+        LocalDateTime startDateTime = prevOrderSearch.getStartDateTime();
+        LocalDateTime endDateTime = prevOrderSearch.getEndDateTime();
+
+        // Store 정보 가져오기
+        GetStoreInfoByUserId storeInfo = storeClient.getStoreInfoByUserId(authorization, userId).getData();
+        Long storeId = storeInfo.getStoreId();
+
+        // 주문 내역을 보여줘야 함
+        List<Order> orderList = orderRepository.findByStoreId(startDateTime, endDateTime, storeId, OrderStatus.PENDING, pageable).getContent();
+        List<OrderResponseDto.PrevOrderDto> prevOrderList = orderList.stream()
+                .map(order -> OrderResponseDto.PrevOrderDto.of(order))
+                .collect(Collectors.toList());
+
+
+        // 상품명, 사용자 닉네임 조회
+        Set<Long> userIds = new HashSet<>();
+        Set<Long> itemIds = new HashSet<>();
+
+        for (OrderResponseDto.PrevOrderDto orderDto : prevOrderList) {
+            userIds.add(orderDto.getUserId());
+            for (OrderResponseDto.PrevOrderDto._PrevOrderItem prevOrderItem : orderDto.getPrevOrderItems()) {
+                itemIds.add(prevOrderItem.getItemId());
+            }
+        }
+
+        // feign client 사용자 닉네임 조회, feign client 상품명 조회
+        Map<Long, String> usersInfoMap = userClient.getUserNameMap(authorization, userIds);
+        Map<Long, String> itemInfoMap = storeClient.getItemInfoMap(request, itemIds);
+
+        for (OrderResponseDto.PrevOrderDto prevOrderDto : prevOrderList) {
+            prevOrderDto.changeUserName(usersInfoMap.get(prevOrderDto.getUserId()));
+            for (OrderResponseDto.PrevOrderDto._PrevOrderItem prevOrderItem : prevOrderDto.getPrevOrderItems()) {
+                prevOrderItem.changeItemName(itemInfoMap.get(prevOrderItem.getItemId()));
+            }
+        }
+
+        return prevOrderList;
     }
 }
 

@@ -2,8 +2,8 @@ package com.sesac.foodtruckorder.infrastructure.query.http.repository;
 
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetItemsInfoDto;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreInfoByUserId;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.global.Result;
-import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,7 +58,7 @@ public interface StoreClient {
      * 작성일 2022/04/11
      **/
     @GetMapping("/items/v1/store/{userId}")
-    Result<OrderResponseDto.GetStoreInfoByUserId> getStoreInfoByUserId(String authorization, Long userId);
+    Result<GetStoreInfoByUserId> getStoreInfoByUserId(String authorization, @PathVariable("userId") Long userId);
 
 
     /**
@@ -113,18 +113,15 @@ public interface StoreClient {
      * 작성일 2022-04-09
      **/
     // 재사용성을 위해 default 메서드 이용
-//    default Map<Long, String> getItems(HttpServletRequest request, Set<Long> storeIds) {
-//        String authorization = request.getHeader("Authorization");
-//
-//        if( !storeIds.iterator().hasNext()) return null;
-//        List<GetStoreResponse> storeResponses = this.getItem(authorization, storeIds).getData();
-//        return storeResponses.stream()
-//                .collect(
-//                        Collectors.toMap(getStoreResponse -> getStoreResponse.getStoreId(),
-//                                getStoreResponse -> getStoreResponse.getStoreName())
-//                );
-//    }
+    default Map<Long, String> getItemInfoMap(HttpServletRequest request, Set<Long> storeIds) {
+        String authorization = request.getHeader("Authorization");
 
-
-
+        if( !storeIds.iterator().hasNext()) return null;
+        List<GetItemsInfoDto> itemInfoMap = this.getItem(authorization, storeIds).getData();
+        return itemInfoMap.stream()
+                .collect(
+                        Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(),
+                                getItemsInfoDto -> getItemsInfoDto.getItemName())
+                );
+    }
 }
