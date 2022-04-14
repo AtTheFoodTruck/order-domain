@@ -8,6 +8,7 @@ import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -27,15 +29,15 @@ public class ReviewApiController {
     private final Helper helper;
 
     /**
-     * Review 목록 조회 - 사용자 입장
+     * 사용자) Review 목록 조회
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
-    @GetMapping("/orders/v1/reviews")
+    @GetMapping("/orders/v1/customer/reviews")
     public ResponseEntity<?> findReviews(HttpServletRequest request,
                                          @RequestBody ReviewRequestDto.RequestReviewList requestDto,
-                                         Pageable pageable) {
+                                         @PageableDefault(page=0, size=5) Pageable pageable) {
 
         Long userId = requestDto.getUserId();
 
@@ -50,7 +52,7 @@ public class ReviewApiController {
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
-    @PostMapping("/orders/v1/reviews")
+    @PostMapping("/orders/v1/customer/reviews")
     public ResponseEntity<?> createReview(@RequestBody ReviewRequestDto.RequestReviewForm requestReviewForm,
                                           @Valid BindingResult results) {
 
@@ -73,7 +75,7 @@ public class ReviewApiController {
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
-    @DeleteMapping("/orders/v1/reviews")
+    @DeleteMapping("/orders/v1/customer/reviews")
     public ResponseEntity<?> deleteReview(@RequestBody ReviewRequestDto.DeleteReview deleteReview) {
 
         Long userId = deleteReview.getUserId();
@@ -81,4 +83,24 @@ public class ReviewApiController {
 
         return reviewService.deleteReview(userId, reviewId);
     }
+
+
+    /**
+     * 점주) 리뷰 목록 조회
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/13
+     **/
+    @GetMapping("/orders/v1/owner/reviews")
+    public ResponseEntity<?> getStoreReviewList(HttpServletRequest request,
+                                                @RequestBody ReviewRequestDto.ReqOwnerReviewList reqOwnerReviewList,
+                                                @PageableDefault(page = 0, size = 10) Pageable pageable) {
+
+        List<ReviewResponseDto.ResOwnerReviewList> storeReviewList
+                = reviewService.getStoreReviewList(request, reqOwnerReviewList, pageable);
+
+        return response.success(storeReviewList);
+
+    }
+
 }

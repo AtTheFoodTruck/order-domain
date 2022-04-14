@@ -66,7 +66,7 @@ public class OrderCustomerApiController {
 
         orderService.addItemToCart(orderItemDto, storeId, userId);
 
-        return response.success("", HttpStatus.NO_CONTENT);
+        return response.success("", HttpStatus.CREATED);
     }
 
     /**
@@ -107,7 +107,7 @@ public class OrderCustomerApiController {
     }
 
     /**
-     * 주문 내역 조회
+     * 고객) 주문 내역 조회
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022-04-10
@@ -115,7 +115,7 @@ public class OrderCustomerApiController {
     @GetMapping("/orders/v1/customer/order")
     public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
                                               OrderRequestDto.RequestOrderListDto requestOrderListDto,
-                                              @PageableDefault(page = 0, size = 10) Pageable pageable) {
+                                              @PageableDefault(page = 0, size = 5) Pageable pageable) {
         Long userId = requestOrderListDto.getUserId();
 
         List<OrderResponseDto.OrderHistory> orderHistory = orderService.findOrderHistory(pageable, request, userId);

@@ -18,7 +18,7 @@ public class Review extends BaseEntity {
     @Column(name = "review_id")
     private Long id;            // ReviewID
     private String content;     // 리뷰 내용
-    private int rating;         // 리뷰 별점
+    private Double rating;         // 리뷰 별점
 
     @Embedded
     private Images images;

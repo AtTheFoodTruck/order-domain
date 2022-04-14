@@ -5,6 +5,7 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderSta
 import com.sesac.foodtruckorder.ui.dto.Helper;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.OrderRequestDto;
+import com.sesac.foodtruckorder.ui.dto.request.ReviewRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,10 +42,10 @@ public class OrderOwnerApiController {
      * @version 1.0.0
      * 작성일 2022/04/03
     **/
-    @GetMapping("/orders/v1/owner/oder")
+    @GetMapping("/orders/v1/owner/order")
     public ResponseEntity<?> orderMainPage(HttpServletRequest request,
                                            @Valid OrderRequestDto.OrderSearchCondition condition,
-                                           Pageable pageable) {
+                                           @PageableDefault(page = 0, size = 10) Pageable pageable) {
 
         OrderResponseDto.OrderMainDto orderMainPage = orderService.findOrderMainPage(request, condition, pageable);
 
@@ -121,7 +122,7 @@ public class OrderOwnerApiController {
      * @version 1.0.0
      * 작성일 2022/04/12
      **/
-    @GetMapping("/orders/v1/owner/prev/order")
+    @GetMapping("/orders/v1/owner/prev-order")
     public ResponseEntity<?> getPrevOrderList(HttpServletRequest request,
                                               @Valid @RequestBody OrderRequestDto.PrevOrderSearch prevOrderSearch,
                                               BindingResult results,
@@ -205,4 +206,5 @@ public class OrderOwnerApiController {
 
         return response.success(orderDetail);
     }
+
 }
