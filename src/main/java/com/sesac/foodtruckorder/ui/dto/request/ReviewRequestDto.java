@@ -21,7 +21,7 @@ public class ReviewRequestDto {
     public class RequestReviewForm {
         private Long userId;        // 사용자 ID
         @NotEmpty(message = "별점을 입력해주세요.")
-        private int rating;         // 별점
+        private Double rating;         // 별점
         private String imgName;     // 리뷰 사진 이름
         private String imgUrl;      // 리뷰 사진 url
         @NotBlank(message = "리뷰 내용을 입력해주세요.")
@@ -38,7 +38,7 @@ public class ReviewRequestDto {
     **/
     @Getter @Builder
     public static class ReviewDto {
-        private int rating;
+        private Double rating;
         private String content;
         private _ReviewImages images;
 
@@ -70,7 +70,6 @@ public class ReviewRequestDto {
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
     public class DeleteReview {
-
         private Long reviewId;
         private Long userId;
     }
@@ -84,6 +83,19 @@ public class ReviewRequestDto {
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
     public class RequestReviewList {
+        private Long userId;
+    }
+
+    /**
+     * 점주) 리뷰 목록 조회
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/13
+     **/
+    @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Data
+    public static class ReqOwnerReviewList {
+        private Long storeId;
         private Long userId;
     }
 }

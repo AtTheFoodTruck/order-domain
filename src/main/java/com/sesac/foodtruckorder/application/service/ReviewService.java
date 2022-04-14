@@ -8,6 +8,7 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Review;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepository;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.ReviewRepository;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
+import com.sesac.foodtruckorder.infrastructure.query.http.repository.UserClient;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.ReviewRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
@@ -31,6 +32,8 @@ public class ReviewService {
 
     private final OrderRepository orderRepository;
     private final ReviewRepository reviewRepository;
+//    private final ReviewRepositoryCustom reviewRepositoryCustom;
+    private final UserClient userClient;
     private final Response response;
     private final StoreClient storeClient;
 
@@ -127,5 +130,38 @@ public class ReviewService {
         reviewRepository.delete(findReview);
 
         return response.success("리뷰 삭제 완료되었습니다");
+    }
+
+
+    /**
+     * 점주) Review 목록 조회
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/13
+    **/
+    public List<ReviewResponseDto.ResOwnerReviewList> getStoreReviewList(HttpServletRequest request, ReviewRequestDto.ReqOwnerReviewList reqOwnerReviewList,
+                                                                         Pageable pageable) {
+        String authorization = request.getHeader("Authorization");
+        Long storeId = reqOwnerReviewList.getStoreId();
+
+        //return ReviewImgUrl, userName, rating, content, createDate
+        List<Review> reviews = reviewRepository.findByStoreIdOrderByCreatedDateDesc(storeId, pageable).getContent();
+
+        Set<Long> userIds = new HashSet<>();
+        List<ReviewResponseDto.ResOwnerReviewList> reviewLists = reviews.stream()
+                .map(review -> {
+                    ReviewResponseDto.ResOwnerReviewList resOwnerReviewList = new ReviewResponseDto.ResOwnerReviewList(review);
+                    userIds.add(review.getUserId());
+                    return resOwnerReviewList;
+                }).collect(Collectors.toList());
+
+        Map<Long, String> userNameMap = userClient.getUserNameMap(authorization, userIds);
+
+        for (ReviewResponseDto.ResOwnerReviewList review : reviewLists) {
+            review.changeUserName(userNameMap.get(review.getUserId()));
+        }
+
+        return reviewLists;
+
     }
 }

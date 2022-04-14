@@ -1,6 +1,8 @@
 package com.sesac.foodtruckorder.ui.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Order;
+import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Review;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,7 +24,7 @@ public class ReviewResponseDto {
         private Long storeId;               // 가게ID
         private String storeName;           // 가게명
         private String storeImgUrl;         // 가게Img
-        private int rating;                 // 별점
+        private Double rating;                 // 별점
         private LocalDateTime reviewTime;   // 리뷰 생성 일자
         private long orderPrice;            // 총주문가격
 //    private List<ReviewHistory> orders = new ArrayList<>();
@@ -47,4 +49,48 @@ public class ReviewResponseDto {
         }
     }
 
+    /**
+     * 점주) Review 목록 조회 응답 DTO
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/13
+     **/
+    @Data @NoArgsConstructor
+    public static class ResOwnerReviewList {
+        private Long storeId;
+        @JsonIgnore
+        private Long userId;
+        private String reviewImgUrl;
+        private String userName;
+        private Double rating;
+        private LocalDateTime createdDate;
+        private String content;
+
+        public ResOwnerReviewList(Review review) {
+            this.storeId = review.getStoreId();
+            this.userId = review.getUserId();
+            this.reviewImgUrl = review.getImages().getImgUrl();
+            this.rating = review.getRating();
+            this.createdDate = review.getCreatedDate();
+            this.content = review.getContent();
+        }
+
+        public void changeUserName(String userName) {
+            this.userName = userName;
+        }
+    }
+
+    /**
+     * ReviewResponseDto 의 설명 적기
+     * @author jjaen
+     * @version 1.0.0
+     * 작성일 2022/04/14
+     **/
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ResReviewInfoDto {
+        private Long storeId;
+        private Double avgRating;
+    }
 }
