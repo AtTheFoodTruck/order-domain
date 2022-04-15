@@ -7,8 +7,12 @@ import com.sesac.foodtruckorder.ui.dto.request.OrderItemRequestDto;
 import com.sesac.foodtruckorder.ui.dto.request.OrderRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderItemResponseDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -118,10 +122,38 @@ public class OrderCustomerApiController {
                                               @PageableDefault(page = 0, size = 5) Pageable pageable) {
         Long userId = requestOrderListDto.getUserId();
 
-        List<OrderResponseDto.OrderHistory> orderHistory = orderService.findOrderHistory(pageable, request, userId);
+        Page<OrderResponseDto.OrderHistory> orderHistory = orderService.findOrderHistory(pageable, request, userId);
 
-        return response.success(orderHistory);
+        ResponseOrderHistory responseOrderHistory =
+                new ResponseOrderHistory(orderHistory.getContent(), orderHistory.getNumber(), orderHistory.getTotalPages());
+
+        return response.success(responseOrderHistory);
     }
+
+    /**
+     * 주문 내역 조회 response dto
+     * @author jjaen
+     * @version 1.0.0
+     * 작성일 2022/04/15
+     **/
+    @Data @AllArgsConstructor @NoArgsConstructor
+    static class ResponseOrderHistory {
+        private List<OrderResponseDto.OrderHistory> orderHistoryList;
+        private _Page page;
+
+        public ResponseOrderHistory(List<OrderResponseDto.OrderHistory> orderHistoryList, int startPage, int totalPage) {
+            this.orderHistoryList = orderHistoryList;
+            this.page = new _Page(startPage, totalPage);
+        }
+
+        @Data @AllArgsConstructor
+        static class _Page {
+            int startPage;
+            int totalPage;
+        }
+    }
+
+
 
     /**
      * 주문 생성

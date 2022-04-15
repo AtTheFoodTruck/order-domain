@@ -24,10 +24,20 @@ public class ReviewResponseDto {
         private Long storeId;               // 가게ID
         private String storeName;           // 가게명
         private String storeImgUrl;         // 가게Img
-        private Double rating;                 // 별점
+        private Double rating;              // 별점
         private LocalDateTime reviewTime;   // 리뷰 생성 일자
         private long orderPrice;            // 총주문가격
+        private String content;             // 리뷰 내용
 //    private List<ReviewHistory> orders = new ArrayList<>();
+
+
+        public ReviewHistoryDto(Long reviewId, Double rating, LocalDateTime reviewTime, long orderPrice, String content) {
+            this.reviewId = reviewId;
+            this.rating = rating;
+            this.reviewTime = reviewTime;
+            this.orderPrice = orderPrice;
+            this.content = content;
+        }
 
         public static ReviewHistoryDto of(Order order) {
             ReviewHistoryDto reviewHistoryDto = new ReviewHistoryDto();

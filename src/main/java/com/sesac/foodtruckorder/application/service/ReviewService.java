@@ -6,7 +6,9 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Order;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderStatus;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Review;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepository;
+import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepositoryCustom;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.ReviewRepository;
+import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.ReviewRepositoryCustom;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.UserClient;
 import com.sesac.foodtruckorder.ui.dto.Response;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +35,8 @@ public class ReviewService {
 
     private final OrderRepository orderRepository;
     private final ReviewRepository reviewRepository;
-//    private final ReviewRepositoryCustom reviewRepositoryCustom;
+    private final ReviewRepositoryCustom reviewRepositoryCustom;
+    private final OrderRepositoryCustom orderRepositoryCustom;
     private final UserClient userClient;
     private final Response response;
     private final StoreClient storeClient;
@@ -43,17 +47,19 @@ public class ReviewService {
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
-    public List<ReviewResponseDto.ReviewHistoryDto> findReviews(HttpServletRequest request,
+    public Page<ReviewResponseDto.ReviewHistoryDto> findReviews(HttpServletRequest request,
                                                                 Long userId, Pageable pageable) {
 
         // 1. 페이징 리뷰 목록 조회
-        Page<Order> orders = reviewRepository.findByReviews(pageable, userId, OrderStatus.COMPLETED);
+//        Page<Order> orders = reviewRepository.findByReviews(pageable, userId, OrderStatus.COMPLETED);
+        Page<ReviewResponseDto.ReviewHistoryDto> reviewList = orderRepositoryCustom.getReviewList(pageable, userId);
+        List<ReviewResponseDto.ReviewHistoryDto> reviewHistoryDtoList = reviewList.getContent();
 
         // 2. 리뷰 목록을 dto로 변환
-        List<ReviewResponseDto.ReviewHistoryDto> reviewHistoryDtoList = orders.getContent()
-                .stream()
-                .map(order -> ReviewResponseDto.ReviewHistoryDto.of(order))
-                .collect(Collectors.toList());
+//        List<ReviewResponseDto.ReviewHistoryDto> reviewHistoryDtoList = orders.getContent()
+//                .stream()
+//                .map(order -> ReviewResponseDto.ReviewHistoryDto.of(order))
+//                .collect(Collectors.toList());
 
         // 3. 조회한 리뷰 목록(List)를 담을 Id을 Set객체를 이용해서 담을 거예여
         Set<Long> storeIds = new HashSet<>();
@@ -75,7 +81,8 @@ public class ReviewService {
             reviewHistoryDto.changeStoreImgUrl(storeImgUrl);
         }
 
-        return reviewHistoryDtoList;
+        return PageableExecutionUtils.getPage(reviewHistoryDtoList, pageable, () -> reviewList.getTotalElements());
+//        return reviewHistoryDtoList;
     }
 
     /**
@@ -139,16 +146,18 @@ public class ReviewService {
      * @version 1.0.0
      * 작성일 2022/04/13
     **/
-    public List<ReviewResponseDto.ResOwnerReviewList> getStoreReviewList(HttpServletRequest request, ReviewRequestDto.ReqOwnerReviewList reqOwnerReviewList,
+    public Page<ReviewResponseDto.ResOwnerReviewList> getStoreReviewList(HttpServletRequest request, ReviewRequestDto.ReqOwnerReviewList reqOwnerReviewList,
                                                                          Pageable pageable) {
         String authorization = request.getHeader("Authorization");
         Long storeId = reqOwnerReviewList.getStoreId();
 
         //return ReviewImgUrl, userName, rating, content, createDate
-        List<Review> reviews = reviewRepository.findByStoreIdOrderByCreatedDateDesc(storeId, pageable).getContent();
+//        List<Review> reviews = reviewRepository.findByStoreIdOrderByCreatedDateDesc(storeId, pageable).getContent();
+        Page<Review> reviews = reviewRepositoryCustom.findOwnerReviewList(pageable, storeId);
+//        List<Review> reviews = reviewRepositoryCustom.findOwnerReviewList(pageable, storeId).getContent();
 
         Set<Long> userIds = new HashSet<>();
-        List<ReviewResponseDto.ResOwnerReviewList> reviewLists = reviews.stream()
+        List<ReviewResponseDto.ResOwnerReviewList> reviewLists = reviews.getContent().stream()
                 .map(review -> {
                     ReviewResponseDto.ResOwnerReviewList resOwnerReviewList = new ReviewResponseDto.ResOwnerReviewList(review);
                     userIds.add(review.getUserId());
@@ -161,7 +170,8 @@ public class ReviewService {
             review.changeUserName(userNameMap.get(review.getUserId()));
         }
 
-        return reviewLists;
+        return PageableExecutionUtils.getPage(reviewLists, pageable, () -> reviews.getTotalElements());
+//        return reviewLists;
 
     }
 }

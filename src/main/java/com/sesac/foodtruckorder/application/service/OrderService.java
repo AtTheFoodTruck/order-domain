@@ -6,6 +6,7 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderIte
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderStatus;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderItemRepository;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepository;
+import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepositoryCustom;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.*;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.global.Result;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final OrderRepositoryCustom orderRepositoryCustom;
     private final Response response;
     private final UserClient userClient;
     private final StoreClient storeClient;
@@ -150,10 +153,12 @@ public class OrderService {
      * @version 1.0.0
      * 작성일 2022/04/11
     **/
-    public List<OrderResponseDto.OrderHistory> findOrderHistory(Pageable pageable, HttpServletRequest request, Long userId) {
+    public Page<OrderResponseDto.OrderHistory> findOrderHistory(Pageable pageable, HttpServletRequest request, Long userId) {
         String authorization = request.getHeader("Authorization");
         // 주문 정보 조회 - 페이징
-        Page<Order> findOrder = orderRepository.findByUserIdAndPaging(pageable, userId, OrderStatus.PENDING);
+//        Page<Order> findOrder = orderRepository.findByUserIdAndPaging(pageable, userId, OrderStatus.PENDING);
+        // 주문 내역 조회 - QueryDsl - refactoring
+        Page<Order> findOrder = orderRepositoryCustom.findOrderHistory(pageable, userId);
 
         // 주문 정보 dto 변환
         List<OrderResponseDto.OrderHistory> orderHistoryList = findOrder.getContent().stream()
@@ -186,7 +191,8 @@ public class OrderService {
             }
         }
 
-        return orderHistoryList;
+        return PageableExecutionUtils.getPage(orderHistoryList, pageable, () -> findOrder.getTotalElements());
+//        return orderHistoryList;
     }
 
     /**
@@ -249,7 +255,7 @@ public class OrderService {
      * @version 1.0.0
      * 작성일 2022/04/12
     **/
-    public List<OrderResponseDto.PrevOrderDto> findPrevOrderList(HttpServletRequest request,
+    public Page<OrderResponseDto.PrevOrderDto> findPrevOrderList(HttpServletRequest request,
                                                            OrderRequestDto.PrevOrderSearch prevOrderSearch,
                                                            Pageable pageable) {
         String authorization = request.getHeader("Authorization");
@@ -262,11 +268,11 @@ public class OrderService {
         Long storeId = storeInfo.getStoreId();
 
         // 주문 내역을 보여줘야 함
-        List<Order> orderList = orderRepository.findByStoreId(startDateTime, endDateTime, storeId, OrderStatus.PENDING, pageable).getContent();
-        List<OrderResponseDto.PrevOrderDto> prevOrderList = orderList.stream()
+//        List<Order> orderList = orderRepository.findByStoreId(startDateTime, endDateTime, storeId, OrderStatus.PENDING, pageable).getContent();
+        Page<Order> orderList = orderRepositoryCustom.findPrevOrderList(prevOrderSearch, pageable, storeId);
+        List<OrderResponseDto.PrevOrderDto> prevOrderList = orderList.getContent().stream()
                 .map(order -> OrderResponseDto.PrevOrderDto.of(order))
                 .collect(Collectors.toList());
-
 
         // 상품명, 사용자 닉네임 조회
         Set<Long> userIds = new HashSet<>();
@@ -290,7 +296,8 @@ public class OrderService {
             }
         }
 
-        return prevOrderList;
+        return PageableExecutionUtils.getPage(prevOrderList, pageable, () -> orderList.getTotalElements());
+//        return prevOrderList;
     }
 
     /**

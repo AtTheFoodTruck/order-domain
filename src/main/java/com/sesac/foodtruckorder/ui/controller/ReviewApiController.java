@@ -5,8 +5,12 @@ import com.sesac.foodtruckorder.ui.dto.Helper;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.ReviewRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -41,10 +45,30 @@ public class ReviewApiController {
 
         Long userId = requestDto.getUserId();
 
-        List<ReviewResponseDto.ReviewHistoryDto> reviews = reviewService.findReviews(request, userId, pageable);
+//        List<ReviewResponseDto.ReviewHistoryDto> reviews = reviewService.findReviews(request, userId, pageable);
+        Page<ReviewResponseDto.ReviewHistoryDto> reviews = reviewService.findReviews(request, userId, pageable);
 
-        return response.success(reviews);
+        ResponseReviewHistory responseReviewHistory = new ResponseReviewHistory(reviews.getContent(), reviews.getNumber(), reviews.getTotalPages());
+
+        return response.success(responseReviewHistory);
     }
+
+    /**
+     * 사용자) 리뷰 목록 조회 응답 DTO
+     * @author jjaen
+     * @version 1.0.0
+     * 작성일 2022/04/15
+    **/
+    static class ResponseReviewHistory {
+        private List<ReviewResponseDto.ReviewHistoryDto> reviewHistoryDtoList;
+        private OrderCustomerApiController.ResponseOrderHistory._Page page;
+
+        public ResponseReviewHistory(List<ReviewResponseDto.ReviewHistoryDto> reviewHistoryDtoList, int startPage, int totalPage) {
+            this.reviewHistoryDtoList = reviewHistoryDtoList;
+            page = new OrderCustomerApiController.ResponseOrderHistory._Page(startPage, totalPage);
+        }
+    }
+
 
     /**
      * Review 생성
@@ -96,11 +120,28 @@ public class ReviewApiController {
                                                 @RequestBody ReviewRequestDto.ReqOwnerReviewList reqOwnerReviewList,
                                                 @PageableDefault(page = 0, size = 10) Pageable pageable) {
 
-        List<ReviewResponseDto.ResOwnerReviewList> storeReviewList
-                = reviewService.getStoreReviewList(request, reqOwnerReviewList, pageable);
+//        List<ReviewResponseDto.ResOwnerReviewList> storeReviewList = reviewService.getStoreReviewList(request, reqOwnerReviewList, pageable);
+        Page<ReviewResponseDto.ResOwnerReviewList> storeReviewList = reviewService.getStoreReviewList(request, reqOwnerReviewList, pageable);
+
 
         return response.success(storeReviewList);
+    }
 
+    /**
+     * 점주) 리뷰 목록 응답 dto
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/15
+    **/
+    @Data @AllArgsConstructor @NoArgsConstructor
+    static class ResponseStoreReview {
+        private List<ReviewResponseDto.ResOwnerReviewList> reviews;
+        private OrderCustomerApiController.ResponseOrderHistory._Page page;
+
+        public ResponseStoreReview(List<ReviewResponseDto.ResOwnerReviewList> reviews, int startPage, int endPage) {
+            this.reviews = reviews;
+            this.page = new OrderCustomerApiController.ResponseOrderHistory._Page(startPage, endPage);
+        }
     }
 
 }

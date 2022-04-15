@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -140,10 +141,10 @@ public class OrderOwnerApiController {
             response.fail("시작일은 종료일보다 클 수 없습니다.", HttpStatus.BAD_REQUEST);
         }
 
-        List<OrderResponseDto.PrevOrderDto> prevOrderList = orderService.findPrevOrderList(request, prevOrderSearch, pageable);
-
+//        List<OrderResponseDto.PrevOrderDto> prevOrderList = orderService.findPrevOrderList(request, prevOrderSearch, pageable);
+        Page<OrderResponseDto.PrevOrderDto> prevOrderList = orderService.findPrevOrderList(request, prevOrderSearch, pageable);
         // orderId, orderStatus, orderTime, orderItemId, itemName, orderTotalPrice, userName
-        PrevOrderResponse prevOrderResponse = new PrevOrderResponse(prevOrderList);
+        PrevOrderResponse prevOrderResponse = new PrevOrderResponse(prevOrderList.getContent(), prevOrderList.getNumber(), prevOrderList.getTotalPages());
 
         return response.success(prevOrderResponse);
     }
@@ -152,9 +153,11 @@ public class OrderOwnerApiController {
 
     static class PrevOrderResponse {
         private List<_Order> orders;
+        private OrderCustomerApiController.ResponseOrderHistory._Page page;
 
-        public PrevOrderResponse(List<OrderResponseDto.PrevOrderDto> prevOrderdtoList) {
+        public PrevOrderResponse(List<OrderResponseDto.PrevOrderDto> prevOrderdtoList, int startPage, int totalPage) {
             this.orders = prevOrderdtoList.stream().map(orders -> new _Order(orders)).collect(Collectors.toList());
+            page = new OrderCustomerApiController.ResponseOrderHistory._Page(startPage, totalPage);
         }
 
         static class _Order {
