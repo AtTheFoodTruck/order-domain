@@ -91,14 +91,16 @@ public class OrderResponseDto {
     @Data
     public static class OrderMainDto{
         private List<_Order> orders;
+        private boolean hasNext;
 
-        public static OrderMainDto of(List<Order> orders) {
+        public static OrderMainDto of(List<Order> orders, boolean hasNext) {
             OrderMainDto orderMainDto = new OrderMainDto();
             List<_Order> orderList = orders.stream().
                     map(order -> _Order.of(order))
                     .collect(Collectors.toList());
 
             orderMainDto.orders = orderList;
+            orderMainDto.hasNext = hasNext;
 
             return orderMainDto;
         }

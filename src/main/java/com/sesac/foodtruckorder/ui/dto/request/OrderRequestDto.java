@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -94,6 +93,18 @@ public class OrderRequestDto {
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
     public static class OrderDetailSearch {
+        private Long orderId;
+    }
+
+    /**
+     * 점주) 요청 주문 접수
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/15
+    **/
+    @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Data
+    public class ChangeOrderStatus {
         private Long orderId;
     }
 }

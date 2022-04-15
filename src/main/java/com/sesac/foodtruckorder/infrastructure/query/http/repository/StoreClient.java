@@ -24,7 +24,7 @@ public interface StoreClient {
      * @version 1.0.0
      * 작성일 2022/04/11
     **/
-    @GetMapping("/items/v1/store/reviews")
+    @GetMapping("/api/v1/store/reviews")
     Result<List<GetStoreResponse>> getStoreNameImageMap(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
                                                         @PathVariable("storeId") Iterable<Long> storeIds);
 
@@ -35,7 +35,7 @@ public interface StoreClient {
      * @version 1.0.0
      * 작성일 2022/04/11
     **/
-    @GetMapping("/items/v1/store/{storeId}")
+    @GetMapping("/api/v1/store/{storeId}")
     Result<GetStoreResponse> getStore(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
                                       @PathVariable("storeId") String storeId);
 
@@ -46,7 +46,7 @@ public interface StoreClient {
      * @version 1.0.0
      * 작성일 2022/04/11
     **/
-    @GetMapping("/items/v1/item/{itemId}")
+    @GetMapping("/api/v1/item/{itemId}")
     Result<List<GetItemsInfoDto>> getItem(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
                                           @PathVariable("itemId") Iterable<Long> itemIds);
 
@@ -57,7 +57,7 @@ public interface StoreClient {
      * @version 1.0.0
      * 작성일 2022/04/11
      **/
-    @GetMapping("/items/v1/store/{userId}")
+    @GetMapping("/api/v1/store/{userId}")
     Result<GetStoreInfoByUserId> getStoreInfoByUserId(String authorization, @PathVariable("userId") Long userId);
 
 

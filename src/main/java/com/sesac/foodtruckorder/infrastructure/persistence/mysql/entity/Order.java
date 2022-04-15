@@ -96,9 +96,23 @@ public class Order extends BaseEntity {
         }
     }
 
-    /** 주문 상태 변경 **/
+    /** 주문 상태 변경 -> 주문 상태 **/
     public void changeOrderStatus() {
         this.orderStatus = OrderStatus.ORDER;
     }
 
+    /** 주문 상태 변경 -> 주문 접수 **/
+    public void changeAcceptOrder() {
+        this.orderStatus = OrderStatus.ACCEPTED;
+    }
+
+    /** 주문 상태 변경 -> 주문 거절 **/
+    public void changeRejectOrder() {
+        this.orderStatus = OrderStatus.REJECTED;
+    }
+
+    /** 주문 상태 변경 -> 조리 상태 완료 **/
+    public void changeCompleteOrder() {
+        this.orderStatus = OrderStatus.COMPLETED;
+    }
 }

@@ -5,7 +5,6 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderSta
 import com.sesac.foodtruckorder.ui.dto.Helper;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.OrderRequestDto;
-import com.sesac.foodtruckorder.ui.dto.request.ReviewRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,9 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -38,7 +35,7 @@ public class OrderOwnerApiController {
     private final Response response;
 
     /**
-     * 점주) 주문 조회 페이지
+     * 점주) 주문 조회(접수) 페이지
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022/04/03
@@ -210,4 +207,42 @@ public class OrderOwnerApiController {
         return response.success(orderDetail);
     }
 
+    /**
+     * 점주) 주문 접수 api
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/15
+     **/
+    @PatchMapping("/orders/v1/owner/accept")
+    public ResponseEntity<?> acceptOrder(@RequestBody OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
+        orderService.acceptOrder(changeOrderStatus);
+
+        return response.success("주문 접수 완료");
+    }
+
+    /**
+     * 점주) 주문 거절 api
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/15
+     **/
+    @PatchMapping("/orders/v1/owner/reject")
+    public ResponseEntity<?> rejectOrder(@RequestBody OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
+        orderService.rejectOrder(changeOrderStatus);
+
+        return response.success("주문 접수 거절");
+    }
+
+    /**
+     * 점주) 조리 완료 api
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/15
+     **/
+    @PatchMapping("/orders/v1/owner/complete")
+    public ResponseEntity<?> completeOrder(@RequestBody OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
+        orderService.complete(changeOrderStatus);
+
+        return response.success("조리 완료");
+    }
 }

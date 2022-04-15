@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.jpa.repository.support.Querydsl;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
@@ -135,4 +136,31 @@ public class OrderRepositoryCustom {
         return PageableExecutionUtils.getPage(content, pageable, () -> count);
     }
 
+    /**
+     * 주문 접수 페이지
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/15
+    **/
+    public SliceImpl<Order> findOrderMain(Long storeId, OrderRequestDto.OrderSearchCondition condition, Pageable pageable) {
+        List<Order> orders = queryFactory.selectFrom(order)
+                .where(
+                        order.storeId.eq(storeId),
+                        order.orderTime.between(condition.getOrderStartTime(), condition.getOrderEndTime()),
+                        order.orderStatus.ne(OrderStatus.PENDING)
+                )
+                .orderBy(order.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .distinct()
+                .fetch();
+
+        boolean hasNext = false;
+        if (orders.size() > pageable.getPageSize()) {
+            orders.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(orders, pageable, hasNext);
+    }
 }

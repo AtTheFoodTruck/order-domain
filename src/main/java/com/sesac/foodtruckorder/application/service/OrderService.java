@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -212,13 +213,14 @@ public class OrderService {
         GetStoreInfoByUserId storeInfo = storeClient.getStoreInfoByUserId(authorization, userId).getData();
 
         // 주문 정보 조회 -> Slice
-        List<Order> findOrders = orderRepository.findOrderMainPage(start, end, storeInfo.getStoreId(), OrderStatus.PENDING, pageable).getContent();
+//        List<Order> findOrders = orderRepository.findOrderMainPage(start, end, storeInfo.getStoreId(), OrderStatus.PENDING, pageable).getContent();
+        SliceImpl<Order> findOrders = orderRepositoryCustom.findOrderMain(storeInfo.getStoreId(), condition, pageable);
 
         // 사용자 정보, 아이템 정보 조회
         Set<Long> userIds = new HashSet<>();
         Set<Long> itemIds = new HashSet<>();
 
-        OrderResponseDto.OrderMainDto returnDto = OrderResponseDto.OrderMainDto.of(findOrders);
+        OrderResponseDto.OrderMainDto returnDto = OrderResponseDto.OrderMainDto.of(findOrders.getContent(), findOrders.hasNext());
         List<OrderResponseDto._Order> orders = returnDto.getOrders();
 
         // userId, ItemId set에 추가
@@ -348,11 +350,55 @@ public class OrderService {
      * @version 1.0.0
      * 작성일 2022/04/13
     **/
+    @Transactional
     public void saveOrder(Long userId) {
         orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.PENDING).orElseThrow(
                 () -> new OrderException("장바구니 정보를 찾을 수 없습니다.")
         ).changeOrderStatus();
     }
+
+    /**
+     * 점주) 주문 접수
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/15
+    **/
+    @Transactional
+    public void acceptOrder(OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
+        Long orderId = changeOrderStatus.getOrderId();
+        orderRepository.findByIdAndOrderStatus(orderId, OrderStatus.ORDER).orElseThrow(
+                () -> new OrderException("주문 정보를 찾을 수 없습니다.")
+        ).changeAcceptOrder();
+    }
+
+    /**
+     * 점주) 주문 거절
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/15
+    **/
+    @Transactional
+    public void rejectOrder(OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
+        Long orderId = changeOrderStatus.getOrderId();
+        orderRepository.findByIdAndOrderStatus(orderId, OrderStatus.ORDER).orElseThrow(
+                () -> new OrderException("주문 정보를 찾을 수 없습니다.")
+        ).changeRejectOrder();
+    }
+
+    /**
+     * 점주) 메뉴 조리 완료
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/15
+    **/
+    @Transactional
+    public void complete(OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
+        Long orderId = changeOrderStatus.getOrderId();
+        orderRepository.findByIdAndOrderStatus(orderId, OrderStatus.ORDER).orElseThrow(
+                () -> new OrderException("주문 정보를 찾을 수 없습니다.")
+        ).changeCompleteOrder();
+    }
+
 }
 
 

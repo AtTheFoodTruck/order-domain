@@ -55,7 +55,7 @@ public class ReviewApiController {
 
     /**
      * 사용자) 리뷰 목록 조회 응답 DTO
-     * @author jjaen
+     * @author jaemin
      * @version 1.0.0
      * 작성일 2022/04/15
     **/
