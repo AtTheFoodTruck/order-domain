@@ -5,6 +5,12 @@ import com.sesac.foodtruckorder.ui.dto.Helper;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.ReviewRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,12 +29,13 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Tag(name = "ORDER", description = "리뷰 API")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 public class ReviewApiController {
 
-    private ReviewService reviewService;
+    private final ReviewService reviewService;
     private final Response response;
     private final Helper helper;
 
@@ -38,6 +45,7 @@ public class ReviewApiController {
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
+    @Operation(summary = "고객) 고객이 작성한 리뷰 목록 조회")
     @GetMapping("/orders/v1/customer/reviews")
     public ResponseEntity<?> findReviews(HttpServletRequest request,
                                          @RequestBody ReviewRequestDto.RequestReviewList requestDto,
@@ -59,6 +67,8 @@ public class ReviewApiController {
      * @version 1.0.0
      * 작성일 2022/04/15
     **/
+    @Data
+    @NoArgsConstructor
     static class ResponseReviewHistory {
         private List<ReviewResponseDto.ReviewHistoryDto> reviewHistoryDtoList;
         private OrderCustomerApiController.ResponseOrderHistory._Page page;
@@ -76,6 +86,7 @@ public class ReviewApiController {
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
+    @Operation(summary = "고객) 리뷰 생성")
     @PostMapping("/orders/v1/customer/reviews")
     public ResponseEntity<?> createReview(@RequestBody ReviewRequestDto.RequestReviewForm requestReviewForm,
                                           @Valid BindingResult results) {
@@ -90,8 +101,16 @@ public class ReviewApiController {
 
         Long reviewId = reviewService.createReview(userId, reviewDto);
 
-        return response.success(reviewId,"리뷰 저장", HttpStatus.CREATED);
+        ResReviewCreateDto resReviewCreateDto = new ResReviewCreateDto(reviewId);
+
+        return response.success(resReviewCreateDto,"리뷰 저장", HttpStatus.CREATED);
     }
+
+    @Data @NoArgsConstructor @AllArgsConstructor
+    static class ResReviewCreateDto {
+        private Long reviewId;
+    }
+
 
     /**
      * Review 삭제
@@ -99,6 +118,7 @@ public class ReviewApiController {
      * @version 1.0.0
      * 작성일 2022-04-08
      **/
+    @Operation(summary = "고객) 리뷰 삭제")
     @DeleteMapping("/orders/v1/customer/reviews")
     public ResponseEntity<?> deleteReview(@RequestBody ReviewRequestDto.DeleteReview deleteReview) {
 
@@ -115,6 +135,7 @@ public class ReviewApiController {
      * @version 1.0.0
      * 작성일 2022/04/13
      **/
+    @Operation(summary = "고객) 리뷰 목록 조회")
     @GetMapping("/orders/v1/owner/reviews")
     public ResponseEntity<?> getStoreReviewList(HttpServletRequest request,
                                                 @RequestBody ReviewRequestDto.ReqOwnerReviewList reqOwnerReviewList,

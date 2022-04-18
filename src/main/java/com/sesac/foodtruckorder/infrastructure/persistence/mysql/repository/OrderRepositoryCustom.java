@@ -83,6 +83,7 @@ public class OrderRepositoryCustom {
         // 데이터 쿼리
         List<ReviewResponseDto.ReviewHistoryDto> content = queryFactory.select(
                         Projections.constructor(ReviewResponseDto.ReviewHistoryDto.class,
+                                review.storeId,
                                 review.id,
                                 review.rating,
                                 review.createdDate,
@@ -96,7 +97,8 @@ public class OrderRepositoryCustom {
                         order.orderStatus.eq(OrderStatus.COMPLETED)
 
                 )
-                .orderBy(order.orderTime.desc())
+//                .orderBy(order.orderTime.desc())
+                .orderBy(review.createdDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .distinct()

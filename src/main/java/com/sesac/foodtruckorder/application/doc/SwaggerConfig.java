@@ -30,7 +30,8 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.OAS_30)
                 .produces(PRODUCES)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.sesac.foodtruckuser"))
+//                .apis(RequestHandlerSelectors.basePackage("com.sesac.foodtruckuser"))
+                .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo());

@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 @FeignClient(name = "item-service") //apigateway에 등록된 ApplicationName
 public interface StoreClient {
 
-    // 리뷰 목록 조회에 필요한 가게 정보 조회
     /**
      * 리뷰 목록 조회(가게입장), 주문 내역 조회
      * 가게 정보 조회 - 다중
@@ -24,9 +23,9 @@ public interface StoreClient {
      * @version 1.0.0
      * 작성일 2022/04/11
     **/
-    @GetMapping("/api/v1/store/reviews")
+    @GetMapping("/api/v1/store/reviews/{storeIds}")
     Result<List<GetStoreResponse>> getStoreNameImageMap(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
-                                                        @PathVariable("storeId") Iterable<Long> storeIds);
+                                                        @PathVariable("storeIds") Iterable<Long> storeIds);
 
     /**
      * 장바구니 내역 조회
@@ -35,7 +34,7 @@ public interface StoreClient {
      * @version 1.0.0
      * 작성일 2022/04/11
     **/
-    @GetMapping("/api/v1/store/{storeId}")
+    @GetMapping("/api/v1/store/cart/{storeId}")
     Result<GetStoreResponse> getStore(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
                                       @PathVariable("storeId") String storeId);
 

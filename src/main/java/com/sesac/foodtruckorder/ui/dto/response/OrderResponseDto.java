@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ public class OrderResponseDto {
         private String storeImgUrl;		    // 가게 이미지 URL
         private String storeName;		    // 가게 이름
         private long totalPrice;		    // 총 주문 가격
-        private LocalDateTime orderTime;    // 주문 날짜
+        private String orderTime;    // 주문 날짜
         private OrderStatus orderStatus;    // 주문 상태
         private List<_OrderItems> orderItems;   // 아이템 목록
         // 대기번호
@@ -34,8 +35,10 @@ public class OrderResponseDto {
         public static OrderHistory of(Order order) {
             OrderHistory orderHistory = new OrderHistory();
             orderHistory.orderId = order.getId();
+            orderHistory.storeId = order.getStoreId();
             orderHistory.totalPrice = order.getOrderPrice();
-            orderHistory.orderTime = order.getOrderTime();
+            orderHistory.orderTime = order.getOrderTime()
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             orderHistory.orderStatus = order.getOrderStatus();
             orderHistory.orderItems = order.getOrderItems().stream()
                     .map(orderItem -> _OrderItems.of(orderItem))

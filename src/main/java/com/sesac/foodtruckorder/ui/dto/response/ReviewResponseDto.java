@@ -6,6 +6,7 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Review;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ReviewResponseDto {
 
@@ -25,30 +26,32 @@ public class ReviewResponseDto {
         private String storeName;           // 가게명
         private String storeImgUrl;         // 가게Img
         private Double rating;              // 별점
-        private LocalDateTime reviewTime;   // 리뷰 생성 일자
+        @JsonIgnore
+        private LocalDateTime createReviewTime;   // 리뷰 생성 일자
         private long orderPrice;            // 총주문가격
         private String content;             // 리뷰 내용
+        private String reviewTime;          // 리뷰 생성 일자
 //    private List<ReviewHistory> orders = new ArrayList<>();
 
 
-        public ReviewHistoryDto(Long reviewId, Double rating, LocalDateTime reviewTime, long orderPrice, String content) {
+        public ReviewHistoryDto(Long storeId, Long reviewId, Double rating, LocalDateTime reviewTime, long orderPrice, String content) {
+            this.storeId = storeId;
             this.reviewId = reviewId;
             this.rating = rating;
-            this.reviewTime = reviewTime;
+            this.createReviewTime = reviewTime;
             this.orderPrice = orderPrice;
             this.content = content;
         }
 
-        public static ReviewHistoryDto of(Order order) {
-            ReviewHistoryDto reviewHistoryDto = new ReviewHistoryDto();
-            reviewHistoryDto.reviewId = order.getReview().getId();
-            reviewHistoryDto.storeId = order.getStoreId();
-            reviewHistoryDto.rating = order.getReview().getRating();
-            reviewHistoryDto.reviewTime = order.getReview().getCreatedDate();
-            reviewHistoryDto.orderPrice = order.getOrderPrice();
-
-            return reviewHistoryDto;
-        }
+//        public static ReviewHistoryDto of(Order order) {
+//            ReviewHistoryDto reviewHistoryDto = new ReviewHistoryDto();
+//            reviewHistoryDto.reviewId = order.getReview().getId();
+//            reviewHistoryDto.storeId = order.getStoreId();
+//            reviewHistoryDto.rating = order.getReview().getRating();
+//            reviewHistoryDto.reviewTime = order.getReview().getCreatedDate()
+//                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+//            return reviewHistoryDto;
+//        }
 
         public void changeStoreName(String storeName) {
             this.storeName = storeName;
@@ -56,6 +59,10 @@ public class ReviewResponseDto {
 
         public void changeStoreImgUrl(String storeImgUrl) {
             this.storeImgUrl = storeImgUrl;
+        }
+
+        public void changeReviewTime(LocalDateTime createReviewTime) {
+            this.reviewTime = createReviewTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }
     }
 

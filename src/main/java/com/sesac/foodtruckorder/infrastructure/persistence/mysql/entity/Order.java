@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class Order extends BaseEntity {
     private int waitingNum;             // 대기번호
     private LocalDateTime orderTime;    // 주문 시간
     private long orderPrice;            // 주문 가격
-    private boolean hasReview;          // 리뷰 작성 여부
+//    private boolean hasReview;          // 리뷰 작성 여부
 
     // User
     private Long userId;
@@ -39,8 +40,8 @@ public class Order extends BaseEntity {
     private List<OrderItem> orderItems = new ArrayList<>();
 
     // Review
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "review_id")
+    @OneToOne(fetch = LAZY, mappedBy = "order")
+//    @JoinColumn(name = "review_id")
     private Review review;
 
     public static Order of(Long userId, Long storeId, OrderStatus orderStatus, OrderItem orderItem) {
@@ -99,6 +100,7 @@ public class Order extends BaseEntity {
     /** 주문 상태 변경 -> 주문 상태 **/
     public void changeOrderStatus() {
         this.orderStatus = OrderStatus.ORDER;
+        this.orderTime = LocalDateTime.now();
     }
 
     /** 주문 상태 변경 -> 주문 접수 **/

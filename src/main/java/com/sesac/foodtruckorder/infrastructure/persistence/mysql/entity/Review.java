@@ -30,18 +30,21 @@ public class Review extends BaseEntity {
     private Long storeId;
 
     // order
-    @OneToOne(fetch = LAZY, mappedBy = "review")
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "order_id")
     private Order order;
 
     /** 생성 메서드 **/
-    public static Review of(Long userId, Long storeId, ReviewRequestDto.ReviewDto reviewDto) {
+    public static Review of(Long userId, Long storeId, ReviewRequestDto.ReviewDto reviewDto, Images images, Order order) {
         Review review = new Review();
         review.content = reviewDto.getContent();
         review.rating = reviewDto.getRating();
-        review.rating = reviewDto.getRating();
+        review.images = images;
         review.userId = userId;
         review.storeId = storeId;
+        review.order = order;
 
         return review;
     }
+
 }

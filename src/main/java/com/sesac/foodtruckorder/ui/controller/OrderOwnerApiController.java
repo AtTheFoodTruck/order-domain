@@ -6,6 +6,8 @@ import com.sesac.foodtruckorder.ui.dto.Helper;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.OrderRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Tag(name = "ORDER", description = "점주 주문 API")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -40,6 +43,7 @@ public class OrderOwnerApiController {
      * @version 1.0.0
      * 작성일 2022/04/03
     **/
+    @Operation(summary = "점주) 주문 조회(접수) 페이지")
     @GetMapping("/orders/v1/owner/order")
     public ResponseEntity<?> orderMainPage(HttpServletRequest request,
                                            @Valid OrderRequestDto.OrderSearchCondition condition,
@@ -120,6 +124,7 @@ public class OrderOwnerApiController {
      * @version 1.0.0
      * 작성일 2022/04/12
      **/
+    @Operation(summary = "점주) 이전 주문 내역 조회")
     @GetMapping("/orders/v1/owner/prev-order")
     public ResponseEntity<?> getPrevOrderList(HttpServletRequest request,
                                               @Valid @RequestBody OrderRequestDto.PrevOrderSearch prevOrderSearch,
@@ -198,6 +203,7 @@ public class OrderOwnerApiController {
      * @version 1.0.0
      * 작성일 2022/04/12
      **/
+    @Operation(summary = "점주) 주문내역 상세 보기")
     @GetMapping("/orders/v1/owner/order-detail")
     public ResponseEntity<?> getOrderDetail(HttpServletRequest request,
                                             @RequestBody OrderRequestDto.OrderDetailSearch orderDetailSearch) {
@@ -213,6 +219,7 @@ public class OrderOwnerApiController {
      * @version 1.0.0
      * 작성일 2022/04/15
      **/
+    @Operation(summary = "점주) 주문 상태 변경 - 주문 접수")
     @PatchMapping("/orders/v1/owner/accept")
     public ResponseEntity<?> acceptOrder(@RequestBody OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
         orderService.acceptOrder(changeOrderStatus);
@@ -226,6 +233,7 @@ public class OrderOwnerApiController {
      * @version 1.0.0
      * 작성일 2022/04/15
      **/
+    @Operation(summary = "점주) 주문 상태 변경 - 주문 거절")
     @PatchMapping("/orders/v1/owner/reject")
     public ResponseEntity<?> rejectOrder(@RequestBody OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
         orderService.rejectOrder(changeOrderStatus);
@@ -239,6 +247,7 @@ public class OrderOwnerApiController {
      * @version 1.0.0
      * 작성일 2022/04/15
      **/
+    @Operation(summary = "점주) 주문 상태 변경 - 조리 완료")
     @PatchMapping("/orders/v1/owner/complete")
     public ResponseEntity<?> completeOrder(@RequestBody OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
         orderService.complete(changeOrderStatus);

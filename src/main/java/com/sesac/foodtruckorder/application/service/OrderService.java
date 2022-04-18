@@ -70,7 +70,12 @@ public class OrderService {
 
         Map<Long, String> itemMap = data.stream()
                 .collect(
-                        Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(), GetItemsInfoDto::getItemName)
+                        Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(), getItemsInfoDto -> getItemsInfoDto.getItemName())
+                );
+
+        Map<Long, String> itemImgMap = data.stream()
+                .collect(
+                        Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(), getItemsInfoDto -> getItemsInfoDto.getItemImgUrl())
                 );
 
         // 4. OrderItem정보 조회
@@ -79,8 +84,9 @@ public class OrderService {
                 .map(orderItem ->
                         OrderItemResponseDto.FetchOrderDto.of(
                                 findStore.getStoreName(),
-                                findStore.getImgUrl(),
+//                                findStore.getImgUrl(),
                                 itemMap.get(orderItem.getItemId()),
+                                itemImgMap.get(orderItem.getItemId()),
                                 orderItem))
                 .collect(Collectors.toList());
 
@@ -170,6 +176,7 @@ public class OrderService {
         Set<Long> itemIds = new HashSet<>();
 
         // 주문한 storeId, itemId set객체에 저장
+
         for (OrderResponseDto.OrderHistory orderHistory : orderHistoryList) {
             storeIds.add(orderHistory.getStoreId());
             for (OrderResponseDto._OrderItems orderItems : orderHistory.getOrderItems()) {
@@ -178,17 +185,29 @@ public class OrderService {
         }
 
         // store, item 정보 추출, storeName, itemName
-        Map<Long, String> storeNameMap = storeClient.getStoreInfoMap(request, storeIds);            // 가게 정보 조회(StoreName)
-        Map<Long, String> storeImgaeMap = storeClient.getStoreImageInfoMap(request, storeIds);      // 가게 정보 조회(StoreImageUrl)
-        Result<List<GetItemsInfoDto>> itemNameMap = storeClient.getItem(authorization, itemIds);    // 아이템 정보 조회(itemName)
+        List<GetStoreResponse> data = storeClient.getStoreNameImageMap(authorization, storeIds).getData();
+
+        Map<Long, String> storeNameMap = data.stream().collect(
+                Collectors.toMap(getStoreResponse -> getStoreResponse.getStoreId()
+                        , getStoreResponse -> getStoreResponse.getStoreName())
+        );
+        Map<Long, String> storeImgMap = data.stream().collect(
+                Collectors.toMap(getStoreResponse -> getStoreResponse.getStoreId(),
+                        getStoreResponse -> getStoreResponse.getImgUrl())
+        );
+
+//        Map<Long, String> storeNameMap = storeClient.getStoreInfoMap(request, storeIds);            // 가게 정보 조회(StoreName)
+//        Map<Long, String> storeImgaeMap = storeClient.getStoreImageInfoMap(request, storeIds);      // 가게 정보 조회(StoreImageUrl)
+//        Result<List<GetItemsInfoDto>> itemNameMap = storeClient.getItem(authorization, itemIds);    // 아이템 정보 조회(itemName)
+        Map<Long, String> itemInfoMap = storeClient.getItemInfoMap(request, itemIds);// 아이템 정보 조회(itemName)
 
         for (OrderResponseDto.OrderHistory orderHistory : orderHistoryList) {
             String storeName = storeNameMap.get(orderHistory.getStoreId());
-            String storeImgUrl = storeImgaeMap.get(orderHistory.getStoreId());
+            String storeImgUrl = storeImgMap.get(orderHistory.getStoreId());
             orderHistory.changeStoreName(storeName);
             orderHistory.changeStoreImgUrl(storeImgUrl);
             for (OrderResponseDto._OrderItems orderItems : orderHistory.getOrderItems()) {
-                orderItems.changeItemName(orderItems.getItemName());
+                orderItems.changeItemName(itemInfoMap.get(orderItems.getItemId()));
             }
         }
 
@@ -394,7 +413,7 @@ public class OrderService {
     @Transactional
     public void complete(OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
         Long orderId = changeOrderStatus.getOrderId();
-        orderRepository.findByIdAndOrderStatus(orderId, OrderStatus.ORDER).orElseThrow(
+        orderRepository.findByIdAndOrderStatus(orderId, OrderStatus.ACCEPTED).orElseThrow(
                 () -> new OrderException("주문 정보를 찾을 수 없습니다.")
         ).changeCompleteOrder();
     }

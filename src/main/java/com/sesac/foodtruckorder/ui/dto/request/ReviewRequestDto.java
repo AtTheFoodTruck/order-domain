@@ -18,12 +18,13 @@ public class ReviewRequestDto {
      **/
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
-    public class RequestReviewForm {
+    public static class RequestReviewForm {
         private Long userId;        // 사용자 ID
+        private Long orderId;       // 주문 ID
         @NotEmpty(message = "별점을 입력해주세요.")
         private Double rating;         // 별점
         private String imgName;     // 리뷰 사진 이름
-        private String imgUrl;      // 리뷰 사진 url
+        private String reviewImgUrl;      // 리뷰 사진 url
         @NotBlank(message = "리뷰 내용을 입력해주세요.")
         @Size(min = 5, max = 100, message = "리뷰 내용은 5~100자 이내로 입력해주세요.")
         private String content;     // 리뷰 내용
@@ -38,29 +39,33 @@ public class ReviewRequestDto {
     **/
     @Getter @Builder
     public static class ReviewDto {
+        private Long orderId;
         private Double rating;
         private String content;
-        private _ReviewImages images;
+        private String reviewImgUrl;
+//        private _ReviewImages images;
 
         public static ReviewDto of(RequestReviewForm requestReviewForm) {
-            _ReviewImages reviewImages = _ReviewImages.builder()
-                    .imgName(requestReviewForm.getImgName())
-                    .imgUrl(requestReviewForm.getImgUrl())
-                    .build();
+//            _ReviewImages reviewImages = _ReviewImages.builder()
+//                    .imgName(requestReviewForm.getImgName())
+//                    .imgUrl(requestReviewForm.getImgUrl())
+//                    .build();
 
             return ReviewDto.builder()
+                    .orderId(requestReviewForm.getOrderId())
                     .rating(requestReviewForm.getRating())
                     .content(requestReviewForm.getContent())
-                    .images(reviewImages)
+                    .reviewImgUrl(requestReviewForm.getReviewImgUrl())
+//                    .images(reviewImages)
                     .build();
         }
     }
 
-    @Getter @Builder @NoArgsConstructor @AllArgsConstructor
-    public static class _ReviewImages {
-        private String imgName;
-        private String imgUrl;
-    }
+//    @Getter @Builder @NoArgsConstructor @AllArgsConstructor
+//    public static class _ReviewImages {
+//        private String imgName;
+//        private String imgUrl;
+//    }
     /**
      * 리뷰 삭제 위한 DTO
      * @author jaemin
@@ -69,7 +74,7 @@ public class ReviewRequestDto {
     **/
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
-    public class DeleteReview {
+    public static class DeleteReview {
         private Long reviewId;
         private Long userId;
     }
@@ -82,7 +87,7 @@ public class ReviewRequestDto {
     **/
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
-    public class RequestReviewList {
+    public static class RequestReviewList {
         private Long userId;
     }
 

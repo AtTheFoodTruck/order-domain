@@ -2,11 +2,18 @@ package com.sesac.foodtruckorder.ui.controller;
 
 import com.sesac.foodtruckorder.application.service.OrderItemService;
 import com.sesac.foodtruckorder.application.service.OrderService;
+import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderStatus;
 import com.sesac.foodtruckorder.ui.dto.Response;
 import com.sesac.foodtruckorder.ui.dto.request.OrderItemRequestDto;
 import com.sesac.foodtruckorder.ui.dto.request.OrderRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderItemResponseDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,8 +27,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Tag(name = "ORDER", description = "고객 장바구니, 주문 API")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -33,17 +42,16 @@ public class OrderCustomerApiController {
 
     /**
      * 장바구니 내역 조회
-     *
      * @author jaemin
      * @version 1.0.0
      * 작성일 2022-04-09
      **/
+    @Operation(summary = "고객) 장바구니 내역 조회")
     @GetMapping("/orders/v1/customer/carts")
-    public ResponseEntity<?> fetchOrder(HttpServletRequest request,
-                                        @RequestBody OrderItemRequestDto.RequestOrderItemList requestDto) {
+    public ResponseEntity<?> fetchOrder(HttpServletRequest request, @RequestBody OrderItemRequestDto.RequestOrderItemList requestDto) {
 
         Long userId = requestDto.getUserId();
-        //
+
         List<OrderItemResponseDto.FetchOrderDto> fetchOrderDtos = orderService.fetchOrder(request, userId);
         return response.success(fetchOrderDtos);
     }
@@ -55,6 +63,7 @@ public class OrderCustomerApiController {
      * @version 1.0.0
      * 작성일 2022-04-07
      **/
+    @Operation(summary = "고객) 장바구니 아이템 추가")
     @PostMapping("/orders/v1/customer/carts")
     public ResponseEntity<?> addCartItem(@RequestBody OrderItemRequestDto.RequestItem requestItem) {
 
@@ -79,6 +88,7 @@ public class OrderCustomerApiController {
      * @version 1.0.0
      * 작성일 2022-04-07
      **/
+    @Operation(summary = "고객) 장바구니 아이템 삭제")
     @DeleteMapping("/orders/v1/customer/carts")
     public ResponseEntity<?> deleteOrderItem(@RequestBody OrderItemRequestDto.RequestDeleteItem requestDeleteItem) {
 
@@ -98,6 +108,7 @@ public class OrderCustomerApiController {
      * @version 1.0.0
      * 작성일 2022-04-07
      **/
+    @Operation(summary = "고객) 장바구니 아이템 수량 변경")
     @PatchMapping("/orders/v1/customer/carts")
     public ResponseEntity<?> countControl(@RequestBody OrderItemRequestDto.RequestCountItem requestCountItem) {
 
@@ -116,9 +127,10 @@ public class OrderCustomerApiController {
      * @version 1.0.0
      * 작성일 2022-04-10
      **/
+    @Operation(summary = "고객) 주문 내역 조회")
     @GetMapping("/orders/v1/customer/order")
     public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
-                                              OrderRequestDto.RequestOrderListDto requestOrderListDto,
+                                              @RequestBody OrderRequestDto.RequestOrderListDto requestOrderListDto,
                                               @PageableDefault(page = 0, size = 5) Pageable pageable) {
         Long userId = requestOrderListDto.getUserId();
 
@@ -132,7 +144,7 @@ public class OrderCustomerApiController {
 
     /**
      * 주문 내역 조회 response dto
-     * @author jjaen
+     * @author jaemin
      * @version 1.0.0
      * 작성일 2022/04/15
      **/
@@ -145,6 +157,19 @@ public class OrderCustomerApiController {
             this.orderHistoryList = orderHistoryList;
             this.page = new _Page(startPage, totalPage);
         }
+
+//        @Data
+//        static class _OrderHistoryDto {
+//            private Long orderId;			    // 주문 ID
+//            private Long storeId;               // 가게 ID
+//            private String storeImgUrl;		    // 가게 이미지 URL
+//            private String storeName;		    // 가게 이름
+//            private long totalPrice;		    // 총 주문 가격
+//            private LocalDateTime orderTime;    // 주문 날짜
+//            private OrderStatus orderStatus;    // 주문 상태
+//            private List<OrderResponseDto._OrderItems> orderItems;   // 아이템 목록
+//        }
+
 
         @Data @AllArgsConstructor
         static class _Page {
@@ -159,6 +184,7 @@ public class OrderCustomerApiController {
      * @version 1.0.0
      * 작성일 2022/04/13
      **/
+    @Operation(summary = "고객) 주문 생성")
     @PostMapping("/orders/v1/customer/order")
     public ResponseEntity<?> saveOrder(@RequestBody OrderRequestDto.RequestOrderListDto requestOrderListDto) {
         Long userId = requestOrderListDto.getUserId();

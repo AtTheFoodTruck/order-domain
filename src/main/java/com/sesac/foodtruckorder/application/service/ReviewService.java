@@ -2,6 +2,7 @@ package com.sesac.foodtruckorder.application.service;
 
 import com.sesac.foodtruckorder.exception.OrderException;
 import com.sesac.foodtruckorder.exception.ReviewException;
+import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Images;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Order;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderStatus;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Review;
@@ -71,14 +72,15 @@ public class ReviewService {
 
         // 5. Map을 받아올건데, storeClient Map<id, storeName>
         Map<Long, String> storeInfoMap = storeClient.getStoreInfoMap(request, storeIds);        // 가게 정보 조회(StoreName)
-        Map<Long, String> storeImgaeMap = storeClient.getStoreImageInfoMap(request, storeIds);  // 가게 정보 조회(StoreImageUrl)
+        Map<Long, String> storeImageMap = storeClient.getStoreImageInfoMap(request, storeIds);  // 가게 정보 조회(StoreImageUrl)
 
         // 6. for문 돌면서 dto에 value인 Name을 업데이트해줘야돼
         for (ReviewResponseDto.ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
             String storeName = storeInfoMap.get(reviewHistoryDto.getStoreId());
-            String storeImgUrl = storeImgaeMap.get(reviewHistoryDto.getStoreId());
+            String storeImgUrl = storeImageMap.get(reviewHistoryDto.getStoreId());
             reviewHistoryDto.changeStoreName(storeName);
             reviewHistoryDto.changeStoreImgUrl(storeImgUrl);
+            reviewHistoryDto.changeReviewTime(reviewHistoryDto.getCreateReviewTime());
         }
 
         return PageableExecutionUtils.getPage(reviewHistoryDtoList, pageable, () -> reviewList.getTotalElements());
@@ -96,15 +98,21 @@ public class ReviewService {
 
         // 1. 소비자는 주문 완료된 주문 정보를 조회한다
         // 1. userId로 order정보 꺼내오기, COMPLEDTED
-        Order findOrder = orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.COMPLETED).orElseThrow(
+        Order findOrder = orderRepository.findByIdAndOrderStatus(reviewDto.getOrderId(), OrderStatus.COMPLETED).orElseThrow(
                 () -> new OrderException("주문 내역을 찾을 수 없습니다.")
         );
+//        Order findOrder = orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.COMPLETED).orElseThrow(
+//                () -> new OrderException("주문 내역을 찾을 수 없습니다.")
+//        );
 
         Long storeId = findOrder.getStoreId();
 
         // 2. 리뷰등록화면으로 이동
         // 3. 리뷰 등록을 위한 정보를 입력(사진, 내용, 별점, userId, storeId)
-        Review review = Review.of(userId, storeId, reviewDto);
+        Images images = new Images(reviewDto.getReviewImgUrl());
+
+        Review review = Review.of(userId, storeId, reviewDto, images, findOrder);
+
         // 4. 리뷰 등록
         Review savedReview = reviewRepository.save(review);
 

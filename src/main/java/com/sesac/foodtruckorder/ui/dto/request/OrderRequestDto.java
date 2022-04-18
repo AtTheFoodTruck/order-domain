@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -20,9 +21,12 @@ public class OrderRequestDto {
      * @version 1.0.0
      * 작성일 2022-04-10
      **/
+    @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
+    @ToString
     public static class RequestOrderListDto {
         private Long userId;
+        private Long orderId;
     }
 
     /**
@@ -31,6 +35,7 @@ public class OrderRequestDto {
      * @version 1.0.0
      * 작성일 2022/04/11
      **/
+    @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
     public static class OrderSearchCondition {
         private Long userId;
@@ -58,7 +63,6 @@ public class OrderRequestDto {
      * @version 1.0.0
      * 작성일 2022/04/12
      **/
-
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
     public static class PrevOrderSearch {
@@ -104,7 +108,7 @@ public class OrderRequestDto {
     **/
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
-    public class ChangeOrderStatus {
+    public static class ChangeOrderStatus {
         private Long orderId;
     }
 }
