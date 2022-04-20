@@ -34,7 +34,7 @@ public class ReviewController {
     @Operation(summary = "별점 평균 조회")
     @GetMapping("/api/v1/reviews/{storeId}")
     public ResponseEntity<Result> getReviewInfo(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
-                                                @PathVariable("storeId") Iterable<Long> storeId) {
+                                                @PathVariable("storeId") List<Long> storeId) {
 
         List<ReviewResponseDto.ResReviewInfoDto> content = reviewRepositoryCustom.findAllByStoreId();
 
