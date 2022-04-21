@@ -1,7 +1,6 @@
 package com.sesac.foodtruckorder.ui.dto.response;
 
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderItem;
-import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -26,7 +25,7 @@ public class OrderItemResponseDto {
     public static class FetchOrderDto {
         @Schema(description = "OrderItem ID")
         @ApiModelProperty(value = "OrderItem ID")
-        private Long orderItemid;       // OrderItemId
+        private Long orderItemId;       // OrderItemId
         @ApiModelProperty(value = "Store Name")
         private String storeName;       // 푸드트럭 명
 //        @ApiModelProperty(value = "Store Image URL")
@@ -48,7 +47,7 @@ public class OrderItemResponseDto {
                                        String itemImgUrl,
                                        OrderItem orderItem) {
             FetchOrderDto fetchOrderDto = new FetchOrderDto();
-            fetchOrderDto.orderItemid = orderItem.getId();
+            fetchOrderDto.orderItemId = orderItem.getId();
             fetchOrderDto.storeName = storeName;
 //            fetchOrderDto.storeImgUrl = storeImgUrl;
             fetchOrderDto.itemId = orderItem.getItemId();

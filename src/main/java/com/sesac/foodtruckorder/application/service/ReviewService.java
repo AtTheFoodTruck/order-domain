@@ -10,6 +10,7 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.Orde
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.OrderRepositoryCustom;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.ReviewRepository;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository.ReviewRepositoryCustom;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.StoreClient;
 import com.sesac.foodtruckorder.infrastructure.query.http.repository.UserClient;
 import com.sesac.foodtruckorder.ui.dto.Response;
@@ -50,6 +51,7 @@ public class ReviewService {
      **/
     public Page<ReviewResponseDto.ReviewHistoryDto> findReviews(HttpServletRequest request,
                                                                 Long userId, Pageable pageable) {
+        String authorization = request.getHeader("Authorization");
 
         // 1. 페이징 리뷰 목록 조회
 //        Page<Order> orders = reviewRepository.findByReviews(pageable, userId, OrderStatus.COMPLETED);
@@ -69,10 +71,18 @@ public class ReviewService {
         for (ReviewResponseDto.ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
             storeIds.add(reviewHistoryDto.getStoreId());
         }
+        List<GetStoreResponse> data = storeClient.getStoreNameImageMap(authorization, storeIds).getData();
+        Map<Long, String> storeInfoMap = data.stream().collect(
+                Collectors.toMap(getStoreResponse -> getStoreResponse.getStoreId(), getStoreResponse -> getStoreResponse.getStoreName())
+        );
+
+        Map<Long, String> storeImageMap = data.stream().collect(
+                Collectors.toMap(getStoreResponse -> getStoreResponse.getStoreId(), getStoreResponse -> getStoreResponse.getImgUrl())
+        );
 
         // 5. Map을 받아올건데, storeClient Map<id, storeName>
-        Map<Long, String> storeInfoMap = storeClient.getStoreInfoMap(request, storeIds);        // 가게 정보 조회(StoreName)
-        Map<Long, String> storeImageMap = storeClient.getStoreImageInfoMap(request, storeIds);  // 가게 정보 조회(StoreImageUrl)
+//        Map<Long, String> storeInfoMap = storeClient.getStoreInfoMap(request, storeIds);        // 가게 정보 조회(StoreName)
+//        Map<Long, String> storeImageMap = storeClient.getStoreImageInfoMap(request, storeIds);  // 가게 정보 조회(StoreImageUrl)
 
         // 6. for문 돌면서 dto에 value인 Name을 업데이트해줘야돼
         for (ReviewResponseDto.ReviewHistoryDto reviewHistoryDto : reviewHistoryDtoList) {
