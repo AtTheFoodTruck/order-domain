@@ -80,7 +80,7 @@ public class ReviewResponseDto {
         private String reviewImgUrl;
         private String userName;
         private Double rating;
-        private LocalDateTime createdDate;
+        private String createdDate;
         private String content;
 
         public ResOwnerReviewList(Review review) {
@@ -88,7 +88,7 @@ public class ReviewResponseDto {
             this.userId = review.getUserId();
             this.reviewImgUrl = review.getImages().getImgUrl();
             this.rating = review.getRating();
-            this.createdDate = review.getCreatedDate();
+            this.createdDate = review.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             this.content = review.getContent();
         }
 

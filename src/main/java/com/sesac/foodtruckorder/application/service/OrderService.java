@@ -327,9 +327,8 @@ public class OrderService {
      * @version 1.0.0
      * 작성일 2022/04/12
     **/
-    public OrderResponseDto.OrderDetailDto findOrderDetail(HttpServletRequest request, OrderRequestDto.OrderDetailSearch orderDetailSearch) {
+    public OrderResponseDto.OrderDetailDto findOrderDetail(HttpServletRequest request, Long orderId) {
         String authorization = request.getHeader("Authorization");
-        Long orderId = orderDetailSearch.getOrderId();
 
         Order findOrder = orderRepository.findById(orderId).orElseThrow(
                 () -> new OrderException(orderId + "는 없는 주문 번호입니다")

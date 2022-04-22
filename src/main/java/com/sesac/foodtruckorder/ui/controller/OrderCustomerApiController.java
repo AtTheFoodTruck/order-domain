@@ -43,14 +43,14 @@ public class OrderCustomerApiController {
     /**
      * 장바구니 내역 조회
      * @author jaemin
-     * @version 1.0.0
+     * pathvariable
+     * @version 1.0.1
      * 작성일 2022-04-09
      **/
     @Operation(summary = "고객) 장바구니 내역 조회")
-    @GetMapping("/orders/v1/customer/carts")
-    public ResponseEntity<?> fetchOrder(HttpServletRequest request, @RequestBody OrderItemRequestDto.RequestOrderItemList requestDto) {
-
-        Long userId = requestDto.getUserId();
+    @GetMapping("/orders/v1/customer/carts/{user_id}")
+    public ResponseEntity<?> fetchOrder(HttpServletRequest request,
+                                        @PathVariable("user_id") Long userId) {
 
         List<OrderItemResponseDto.FetchOrderDto> fetchOrderDtos = orderService.fetchOrder(request, userId);
         return response.success(fetchOrderDtos);
@@ -124,11 +124,12 @@ public class OrderCustomerApiController {
     /**
      * 고객) 주문 내역 조회
      * @author jaemin
-     * @version 1.0.0
+     * get -> post 변경, uri 변경
+     * @version 1.0.1
      * 작성일 2022-04-10
      **/
     @Operation(summary = "고객) 주문 내역 조회")
-    @GetMapping("/orders/v1/customer/order")
+    @PostMapping("/orders/v1/customer/order/list")
     public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
                                               @RequestBody OrderRequestDto.RequestOrderListDto requestOrderListDto,
                                               @PageableDefault(page = 0, size = 5) Pageable pageable) {

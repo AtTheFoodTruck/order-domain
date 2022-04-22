@@ -40,11 +40,12 @@ public class OrderOwnerApiController {
     /**
      * 점주) 주문 조회(접수) 페이지
      * @author jaemin
-     * @version 1.0.0
+     * get -> post
+     * @version 1.0.1
      * 작성일 2022/04/03
     **/
     @Operation(summary = "점주) 주문 조회(접수) 페이지")
-    @GetMapping("/orders/v1/owner/order")
+    @PostMapping("/orders/v1/owner/order")
     public ResponseEntity<?> orderMainPage(HttpServletRequest request,
                                            @Valid OrderRequestDto.OrderSearchCondition condition,
                                            @PageableDefault(page = 0, size = 10) Pageable pageable) {
@@ -121,11 +122,12 @@ public class OrderOwnerApiController {
     /**
      * 이전 주문 내역 조회
      * @author jaemin
-     * @version 1.0.0
+     * get -> post
+     * @version 1.0.1
      * 작성일 2022/04/12
      **/
     @Operation(summary = "점주) 이전 주문 내역 조회")
-    @GetMapping("/orders/v1/owner/prev-order")
+    @PostMapping("/orders/v1/owner/prev-order")
     public ResponseEntity<?> getPrevOrderList(HttpServletRequest request,
                                               @Valid @RequestBody OrderRequestDto.PrevOrderSearch prevOrderSearch,
                                               BindingResult results,
@@ -200,15 +202,16 @@ public class OrderOwnerApiController {
     /**
      * 주문 상세 보기
      * @author jaemin
-     * @version 1.0.0
+     * pathvariable
+     * @version 1.0.1
      * 작성일 2022/04/12
      **/
     @Operation(summary = "점주) 주문내역 상세 보기")
-    @GetMapping("/orders/v1/owner/order-detail")
+    @GetMapping("/orders/v1/owner/order-detail/{order_id}")
     public ResponseEntity<?> getOrderDetail(HttpServletRequest request,
-                                            @RequestBody OrderRequestDto.OrderDetailSearch orderDetailSearch) {
+                                            @PathVariable("order_id") Long orderId) {
 
-        OrderResponseDto.OrderDetailDto orderDetail = orderService.findOrderDetail(request, orderDetailSearch);
+        OrderResponseDto.OrderDetailDto orderDetail = orderService.findOrderDetail(request, orderId);
 
         return response.success(orderDetail);
     }
