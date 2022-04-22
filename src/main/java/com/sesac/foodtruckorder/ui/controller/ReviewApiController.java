@@ -42,18 +42,16 @@ public class ReviewApiController {
     /**
      * 사용자) Review 목록 조회
      * @author jaemin
-     * @version 1.0.0
+     * pathvariable
+     * @version 1.0.1
      * 작성일 2022-04-08
      **/
     @Operation(summary = "고객) 고객이 작성한 리뷰 목록 조회")
-    @GetMapping("/orders/v1/customer/reviews")
+    @GetMapping("/orders/v1/customer/reviews/{user_id}")
     public ResponseEntity<?> findReviews(HttpServletRequest request,
-                                         @RequestBody ReviewRequestDto.RequestReviewList requestDto,
+                                         @PathVariable("user_id") Long userId,
                                          @PageableDefault(page=0, size=5) Pageable pageable) {
 
-        Long userId = requestDto.getUserId();
-
-//        List<ReviewResponseDto.ReviewHistoryDto> reviews = reviewService.findReviews(request, userId, pageable);
         Page<ReviewResponseDto.ReviewHistoryDto> reviews = reviewService.findReviews(request, userId, pageable);
 
         ResponseReviewHistory responseReviewHistory = new ResponseReviewHistory(reviews.getContent(), reviews.getNumber(), reviews.getTotalPages());
@@ -132,20 +130,21 @@ public class ReviewApiController {
     /**
      * 점주) 리뷰 목록 조회
      * @author jaemin
-     * @version 1.0.0
+     * get -> post
+     * @version 1.0.1
      * 작성일 2022/04/13
      **/
-    @Operation(summary = "고객) 리뷰 목록 조회")
-    @GetMapping("/orders/v1/owner/reviews")
+    @Operation(summary = "점주) 리뷰 목록 조회")
+    @PostMapping("/orders/v1/owner/reviews")
     public ResponseEntity<?> getStoreReviewList(HttpServletRequest request,
                                                 @RequestBody ReviewRequestDto.ReqOwnerReviewList reqOwnerReviewList,
                                                 @PageableDefault(page = 0, size = 10) Pageable pageable) {
 
-//        List<ReviewResponseDto.ResOwnerReviewList> storeReviewList = reviewService.getStoreReviewList(request, reqOwnerReviewList, pageable);
         Page<ReviewResponseDto.ResOwnerReviewList> storeReviewList = reviewService.getStoreReviewList(request, reqOwnerReviewList, pageable);
 
+        ResponseStoreReview responseStoreReview = new ResponseStoreReview(storeReviewList.getContent(), storeReviewList.getNumber(), storeReviewList.getTotalPages());
 
-        return response.success(storeReviewList);
+        return response.success(responseStoreReview);
     }
 
     /**
