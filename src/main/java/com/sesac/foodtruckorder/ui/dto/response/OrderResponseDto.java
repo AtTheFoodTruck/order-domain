@@ -26,9 +26,10 @@ public class OrderResponseDto {
         private String storeImgUrl;		    // 가게 이미지 URL
         private String storeName;		    // 가게 이름
         private long totalPrice;		    // 총 주문 가격
-        private String orderTime;    // 주문 날짜
+        private String orderTime;           // 주문 날짜
         private OrderStatus orderStatus;    // 주문 상태
         private List<_OrderItems> orderItems;   // 아이템 목록
+        private boolean hasReview;          // 리뷰 작성 여부
         // 대기번호
 
         // 생성 메서드
@@ -43,6 +44,7 @@ public class OrderResponseDto {
             orderHistory.orderItems = order.getOrderItems().stream()
                     .map(orderItem -> _OrderItems.of(orderItem))
                     .collect(Collectors.toList());
+            orderHistory.hasReview = order.getReview().isHasReview();
             //대기번호
 
             return orderHistory;

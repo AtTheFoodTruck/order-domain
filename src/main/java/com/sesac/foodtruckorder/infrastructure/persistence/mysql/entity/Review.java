@@ -18,7 +18,8 @@ public class Review extends BaseEntity {
     @Column(name = "review_id")
     private Long id;            // ReviewID
     private String content;     // 리뷰 내용
-    private Double rating;         // 리뷰 별점
+    private Double rating;      // 리뷰 별점
+    private boolean hasReview;  // 리뷰 작성여부
 
     @Embedded
     private Images images;
@@ -43,6 +44,7 @@ public class Review extends BaseEntity {
         review.userId = userId;
         review.storeId = storeId;
         review.order = order;
+        review.hasReview = true;
 
         return review;
     }
