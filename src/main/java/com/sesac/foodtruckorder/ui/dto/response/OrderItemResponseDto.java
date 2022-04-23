@@ -1,12 +1,12 @@
 package com.sesac.foodtruckorder.ui.dto.response;
 
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderItem;
+import com.sesac.foodtruckorder.ui.controller.OrderCustomerApiController;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 @Schema(description = "장바구니 response DTO")
 public class OrderItemResponseDto {
@@ -26,8 +26,8 @@ public class OrderItemResponseDto {
         @Schema(description = "OrderItem ID")
         @ApiModelProperty(value = "OrderItem ID")
         private Long orderItemId;       // OrderItemId
-        @ApiModelProperty(value = "Store Name")
-        private String storeName;       // 푸드트럭 명
+//        @ApiModelProperty(value = "Store Name")
+//        private String storeName;       // 푸드트럭 명
 //        @ApiModelProperty(value = "Store Image URL")
 //        private String storeImgUrl;     // 푸드트럭 이미지
         @ApiModelProperty(value = "Item ID")
@@ -41,14 +41,15 @@ public class OrderItemResponseDto {
         @ApiModelProperty(value = "Total Price")
         private long totalPrice;        // 금액
 
-        public static FetchOrderDto of(String storeName,
+        public static FetchOrderDto of(
+//                                        String storeName,
 //                                       String storeImgUrl,
                                        String itemName,
                                        String itemImgUrl,
                                        OrderItem orderItem) {
             FetchOrderDto fetchOrderDto = new FetchOrderDto();
             fetchOrderDto.orderItemId = orderItem.getId();
-            fetchOrderDto.storeName = storeName;
+//            fetchOrderDto.storeName = storeName;
 //            fetchOrderDto.storeImgUrl = storeImgUrl;
             fetchOrderDto.itemId = orderItem.getItemId();
             fetchOrderDto.itemName = itemName;
@@ -58,6 +59,22 @@ public class OrderItemResponseDto {
 
             return fetchOrderDto;
         }
+    }
 
+    /**
+     * 최종 장바구니 내역 조회 response dto
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/22
+     **/
+    @Data @NoArgsConstructor
+    public static class ResCartListDto {
+        private String storeName;           // 가게명
+        private List<FetchOrderDto> cartList;   // 장바구니 내역 List
+
+        public ResCartListDto(String storeName, List<FetchOrderDto> list) {
+            this.storeName = storeName;
+            this.cartList = list;
+        }
     }
 }

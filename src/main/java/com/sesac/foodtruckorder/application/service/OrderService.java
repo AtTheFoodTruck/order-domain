@@ -49,7 +49,7 @@ public class OrderService {
      * @version 1.0.0
      * 작성일 2022-04-09
      **/
-    public List<OrderItemResponseDto.FetchOrderDto> fetchOrder(HttpServletRequest request, Long userId) {
+    public OrderItemResponseDto.ResCartListDto fetchOrder(HttpServletRequest request, Long userId) {
 
         String authorization = request.getHeader("Authorization");
 
@@ -83,14 +83,16 @@ public class OrderService {
                 .stream()
                 .map(orderItem ->
                         OrderItemResponseDto.FetchOrderDto.of(
-                                findStore.getStoreName(),
+//                                findStore.getStoreName(),
 //                                findStore.getImgUrl(),
                                 itemMap.get(orderItem.getItemId()),
                                 itemImgMap.get(orderItem.getItemId()),
                                 orderItem))
                 .collect(Collectors.toList());
 
-        return results;
+        OrderItemResponseDto.ResCartListDto resCartListDto = new OrderItemResponseDto.ResCartListDto(findStore.getStoreName(), results);
+
+        return resCartListDto;
     }
 
     /**

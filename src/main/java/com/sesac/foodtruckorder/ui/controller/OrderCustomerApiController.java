@@ -50,10 +50,14 @@ public class OrderCustomerApiController {
     @Operation(summary = "고객) 장바구니 내역 조회")
     @GetMapping("/orders/v1/customer/carts/{user_id}")
     public ResponseEntity<?> fetchOrder(HttpServletRequest request,
-                                        @PathVariable("user_id") Long userId) {
+                                        @PathVariable("user_id") Long userId,
+                                        @PageableDefault(page = 0, size = 10) Pageable pageable) {
 
-        List<OrderItemResponseDto.FetchOrderDto> fetchOrderDtos = orderService.fetchOrder(request, userId);
-        return response.success(fetchOrderDtos);
+        OrderItemResponseDto.ResCartListDto resCartListDto = orderService.fetchOrder(request, userId);
+
+//        OrderItemResponseDto.ResCartListDto resCartListDto = new OrderItemResponseDto.ResCartListDto();
+
+        return response.success(resCartListDto);
     }
 
 
@@ -150,7 +154,7 @@ public class OrderCustomerApiController {
      * 작성일 2022/04/15
      **/
     @Data @AllArgsConstructor @NoArgsConstructor
-    static class ResponseOrderHistory {
+    public static class ResponseOrderHistory {
         private List<OrderResponseDto.OrderHistory> orderHistoryList;
         private _Page page;
 
@@ -173,7 +177,7 @@ public class OrderCustomerApiController {
 
 
         @Data @AllArgsConstructor
-        static class _Page {
+        public static class _Page {
             int startPage;
             int totalPage;
         }

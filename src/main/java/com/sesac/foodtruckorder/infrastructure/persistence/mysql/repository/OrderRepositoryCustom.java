@@ -22,6 +22,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.QOrder.order;
 import static com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.QReview.review;
@@ -165,4 +166,5 @@ public class OrderRepositoryCustom {
 
         return new SliceImpl<>(orders, pageable, hasNext);
     }
+
 }
