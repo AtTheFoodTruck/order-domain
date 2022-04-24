@@ -26,7 +26,6 @@ public class OrderRequestDto {
     @ToString
     public static class RequestOrderListDto {
         private Long userId;
-        private Long orderId;
     }
 
     /**
