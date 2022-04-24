@@ -133,11 +133,10 @@ public class OrderCustomerApiController {
      * 작성일 2022-04-10
      **/
     @Operation(summary = "고객) 주문 내역 조회")
-    @PostMapping("/orders/v1/customer/order/list")
+    @GetMapping("/orders/v1/customer/order/{user_id}")
     public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
-                                              @RequestBody OrderRequestDto.RequestOrderListDto requestOrderListDto,
+                                              @PathVariable("user_id") Long userId,
                                               @PageableDefault(page = 0, size = 5) Pageable pageable) {
-        Long userId = requestOrderListDto.getUserId();
 
         Page<OrderResponseDto.OrderHistory> orderHistory = orderService.findOrderHistory(pageable, request, userId);
 
