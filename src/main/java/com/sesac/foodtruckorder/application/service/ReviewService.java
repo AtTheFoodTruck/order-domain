@@ -1,5 +1,6 @@
 package com.sesac.foodtruckorder.application.service;
 
+import com.querydsl.core.Tuple;
 import com.sesac.foodtruckorder.exception.OrderException;
 import com.sesac.foodtruckorder.exception.ReviewException;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Images;
@@ -104,7 +105,8 @@ public class ReviewService {
      * 작성일 2022-04-08
     **/
     @Transactional
-    public Long createReview(Long userId, ReviewRequestDto.ReviewDto reviewDto) {
+    public Long createReview(HttpServletRequest request, Long userId, ReviewRequestDto.ReviewDto reviewDto) {
+        String authorization = request.getHeader("Authorization");
 
         // 1. 소비자는 주문 완료된 주문 정보를 조회한다
         // 1. userId로 order정보 꺼내오기, COMPLEDTED
@@ -128,6 +130,13 @@ public class ReviewService {
 
         // 5. 리뷰 등록이 완료되면, 주문 정보에 review 정보가 업데이트된다
         findOrder.setReview(review);
+
+        // 6. 가게 정보에 리뷰 평점을 등록
+        // 6-1 가게 정보에 해당하는 리뷰 평점 조회
+        ReviewResponseDto.ResReviewInfoDto reviewInfo = reviewRepositoryCustom.findReviewInfoByStoreId(storeId);
+
+        // 6-2 가게 정보에 save
+        storeClient.saveStoreInfo(authorization, reviewInfo);
 
         return savedReview.getId();
     }

@@ -79,7 +79,7 @@ public class OrderRepositoryCustom {
                 .where(
                         order.userId.eq(userId),
                         order.orderStatus.eq(OrderStatus.COMPLETED)
-                ).fetchOne();
+                ).fetchOne(); // 주문 정보가 4건
 
         // 데이터 쿼리
         List<ReviewResponseDto.ReviewHistoryDto> content = queryFactory.select(

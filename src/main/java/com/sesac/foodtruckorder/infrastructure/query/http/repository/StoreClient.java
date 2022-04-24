@@ -4,6 +4,7 @@ import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetItemsInfoDto;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreInfoByUserId;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.global.Result;
+import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,6 +60,16 @@ public interface StoreClient {
     @GetMapping("/api/v1/store/{userId}")
     Result<GetStoreInfoByUserId> getStoreInfoByUserId(String authorization, @PathVariable("userId") Long userId);
 
+    /**
+     * 리뷰 평점 저장
+     * using by 주문 조회 페이지 (점주)
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/11
+     **/
+    @PostMapping("/api/v1/store/review")
+    void saveStoreInfo(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
+                       @RequestBody ReviewResponseDto.ResReviewInfoDto storeInfo);
 
     /**
      * 가게 이름 정보 조회
