@@ -86,7 +86,8 @@ public class ReviewApiController {
      **/
     @Operation(summary = "고객) 리뷰 생성")
     @PostMapping("/orders/v1/customer/reviews")
-    public ResponseEntity<?> createReview(@RequestBody ReviewRequestDto.RequestReviewForm requestReviewForm,
+    public ResponseEntity<?> createReview(HttpServletRequest request,
+                                          @RequestBody ReviewRequestDto.RequestReviewForm requestReviewForm,
                                           @Valid BindingResult results) {
 
         // validation check
@@ -97,7 +98,7 @@ public class ReviewApiController {
         Long userId = requestReviewForm.getUserId();
         ReviewRequestDto.ReviewDto reviewDto = ReviewRequestDto.ReviewDto.of(requestReviewForm);
 
-        Long reviewId = reviewService.createReview(userId, reviewDto);
+        Long reviewId = reviewService.createReview(request, userId, reviewDto);
 
         ResReviewCreateDto resReviewCreateDto = new ResReviewCreateDto(reviewId);
 
@@ -108,6 +109,13 @@ public class ReviewApiController {
     static class ResReviewCreateDto {
         private Long reviewId;
     }
+
+    @Data @NoArgsConstructor @AllArgsConstructor
+    static class ReviewInfoDto {
+        private Long storeId;
+        private Double ratingAvg;
+    }
+
 
 
     /**

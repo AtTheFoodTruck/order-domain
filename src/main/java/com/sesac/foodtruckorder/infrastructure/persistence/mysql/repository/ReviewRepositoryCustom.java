@@ -1,5 +1,6 @@
 package com.sesac.foodtruckorder.infrastructure.persistence.mysql.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Review;
@@ -28,7 +29,7 @@ public class ReviewRepositoryCustom {
      * @version 1.0.0
      * 작성일 2022/04/15
     **/
-    public List<ReviewResponseDto.ResReviewInfoDto> findAllByStoreId() {
+    public List<ReviewResponseDto.ResReviewInfoDto> findAllByStoreIds(List<Long> storeIds) {
         return queryFactory.select(
                         Projections.constructor(ReviewResponseDto.ResReviewInfoDto.class,
                                 review.storeId,
@@ -36,6 +37,7 @@ public class ReviewRepositoryCustom {
                         )
                 )
                 .from(review)
+                .where(review.storeId.in(storeIds))
                 .groupBy(review.storeId)
                 .fetch();
     }
@@ -65,5 +67,24 @@ public class ReviewRepositoryCustom {
                 .fetch();
 
         return PageableExecutionUtils.getPage(content, pageable, () -> count);
+    }
+    /**
+     * 별점 평균 구하기 - 단건
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/15
+     **/
+    public ReviewResponseDto.ResReviewInfoDto findReviewInfoByStoreId(Long storeId) {
+
+        return queryFactory.select(
+                        Projections.constructor(ReviewResponseDto.ResReviewInfoDto.class,
+                                review.storeId,
+                                review.rating.avg()
+                        )
+                )
+                .from(review)
+                .where(review.storeId.eq(storeId))
+                .groupBy(review.storeId)
+                .fetchOne();
     }
 }

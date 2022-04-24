@@ -55,9 +55,9 @@ public class ReviewRepositoryCustomTest {
         queryFactory = new JPAQueryFactory(em);
 
         //when
-        List<ReviewResponseDto.ResReviewInfoDto> allByStoreId = reviewRepositoryCustom.findAllByStoreId();
-        allByStoreId.stream()
-                .forEach(resReviewInfoDto -> System.out.println("resReviewInfoDto.getAvgRating() = " + resReviewInfoDto.getAvgRating()));
+//        List<ReviewResponseDto.ResReviewInfoDto> allByStoreId = reviewRepositoryCustom.findAllByStoreIds();
+//        allByStoreId.stream()
+//                .forEach(resReviewInfoDto -> System.out.println("resReviewInfoDto.getAvgRating() = " + resReviewInfoDto.getAvgRating()));
 
 
         //then
