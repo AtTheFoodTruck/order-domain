@@ -166,9 +166,9 @@ public class ReviewApiController {
         private List<ReviewResponseDto.ResOwnerReviewList> reviews;
         private OrderCustomerApiController.ResponseOrderHistory._Page page;
 
-        public ResponseStoreReview(List<ReviewResponseDto.ResOwnerReviewList> reviews, int startPage, int endPage) {
+        public ResponseStoreReview(List<ReviewResponseDto.ResOwnerReviewList> reviews, int startPage, int totalPage) {
             this.reviews = reviews;
-            this.page = new OrderCustomerApiController.ResponseOrderHistory._Page(startPage, endPage);
+            this.page = new OrderCustomerApiController.ResponseOrderHistory._Page(startPage, totalPage);
         }
     }
 
