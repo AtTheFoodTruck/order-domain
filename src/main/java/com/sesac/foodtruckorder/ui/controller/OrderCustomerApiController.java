@@ -128,7 +128,7 @@ public class OrderCustomerApiController {
     /**
      * 고객) 주문 내역 조회
      * @author jaemin
-     * get -> post 변경, uri 변경
+     * get -> post 변경, uri 변경, dto, orderId 제거
      * @version 1.0.1
      * 작성일 2022-04-10
      **/
