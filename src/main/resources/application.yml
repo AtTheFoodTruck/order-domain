@@ -12,8 +12,8 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-    main:
-      web-application-type: reactive
+#    main:
+#      web-application-type: reactive
   application:
     name: order-service
   jpa:
