@@ -54,7 +54,7 @@ public class OrderService {
         String authorization = request.getHeader("Authorization");
 
         // 1. order 정보 조회
-        Order findOrder = orderRepository.findByUserId(userId).orElseThrow(
+        Order findOrder = orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.PENDING).orElseThrow(
                 () -> new OrderException("장바구니 정보를 찾을 수 없습니다")
         );
 
