@@ -135,19 +135,10 @@ public class OrderCustomerApiController {
      * 작성일 2022-04-10
      **/
     @Operation(summary = "고객) 주문 내역 조회")
-<<<<<<< HEAD
-    @GetMapping("/orders/v1/customer/order/{user_id}")
-    public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
-                                              @PathVariable("user_id") Long userId,
-                                              @PageableDefault(page = 0, size = 5) Pageable pageable) {
-=======
     @GetMapping("/orders/v1/customer/order/list/{user_id}")
     public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
                                               @PathVariable("user_id") Long userId,
-//                                              @RequestBody OrderRequestDto.RequestOrderListDto requestOrderListDto,
                                               @PageableDefault(page = 0, size = 5) Pageable pageable) {
-//        Long userId = requestOrderListDto.getUserId();
->>>>>>> feature
 
         Page<OrderResponseDto.OrderHistory> orderHistory = orderService.findOrderHistory(pageable, request, userId);
 
