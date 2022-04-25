@@ -104,8 +104,10 @@ public class Order extends BaseEntity {
     }
 
     /** 주문 상태 변경 -> 주문 접수 **/
-    public void changeAcceptOrder() {
+    public Order changeAcceptOrder() {
         this.orderStatus = OrderStatus.ACCEPTED;
+
+        return this;
     }
 
     /** 주문 상태 변경 -> 주문 거절 **/
@@ -116,5 +118,10 @@ public class Order extends BaseEntity {
     /** 주문 상태 변경 -> 조리 상태 완료 **/
     public void changeCompleteOrder() {
         this.orderStatus = OrderStatus.COMPLETED;
+    }
+
+    /** 대기번호 저장**/
+    public void changeWaitingCount(int currentWaitingCount) {
+        this.waitingNum = currentWaitingCount;
     }
 }

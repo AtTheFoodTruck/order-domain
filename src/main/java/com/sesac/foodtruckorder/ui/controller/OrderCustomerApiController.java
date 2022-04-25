@@ -1,5 +1,7 @@
 package com.sesac.foodtruckorder.ui.controller;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.sesac.foodtruckorder.application.service.OrderItemService;
 import com.sesac.foodtruckorder.application.service.OrderService;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderStatus;
@@ -133,11 +135,12 @@ public class OrderCustomerApiController {
      * 작성일 2022-04-10
      **/
     @Operation(summary = "고객) 주문 내역 조회")
-    @PostMapping("/orders/v1/customer/order/list")
+    @GetMapping("/orders/v1/customer/order/list/{user_id}")
     public ResponseEntity<?> findOrderHistory(HttpServletRequest request,
-                                              @RequestBody OrderRequestDto.RequestOrderListDto requestOrderListDto,
+                                              @PathVariable("user_id") Long userId,
+//                                              @RequestBody OrderRequestDto.RequestOrderListDto requestOrderListDto,
                                               @PageableDefault(page = 0, size = 5) Pageable pageable) {
-        Long userId = requestOrderListDto.getUserId();
+//        Long userId = requestOrderListDto.getUserId();
 
         Page<OrderResponseDto.OrderHistory> orderHistory = orderService.findOrderHistory(pageable, request, userId);
 
@@ -191,12 +194,21 @@ public class OrderCustomerApiController {
      **/
     @Operation(summary = "고객) 주문 생성")
     @PostMapping("/orders/v1/customer/order")
-    public ResponseEntity<?> saveOrder(@RequestBody OrderRequestDto.RequestOrderListDto requestOrderListDto) {
-        Long userId = requestOrderListDto.getUserId();
+//    public ResponseEntity<?> saveOrder(@RequestBody OrderRequestDto.RequestOrderListDto requestOrderListDto) {
+    public ResponseEntity<?> saveOrder(@RequestBody CreateOrders createOrders) {
+//        Long userId = requestOrderListDto.getUserId();
+        Long userId = createOrders.getUserId();
 
         orderService.saveOrder(userId);
 
-        return response.success("", HttpStatus.CREATED);
+        return response.success("주문 생성이 완료되었습니다.", HttpStatus.CREATED);
     }
+
+    @JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
+    @Data
+    public static class CreateOrders {
+        private Long userId;
+    }
+
     
 }
