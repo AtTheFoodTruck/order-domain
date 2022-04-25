@@ -78,15 +78,19 @@ public class OrderService {
                         Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(), getItemsInfoDto -> getItemsInfoDto.getItemImgUrl())
                 );
 
+        Map<Long, Long> itemUnitPriceMap = data.stream()
+                .collect(
+                        Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(), getItemsInfoDto -> getItemsInfoDto.getItemPrice())
+                );
+
         // 4. OrderItem정보 조회
         List<OrderItemResponseDto.FetchOrderDto> results = findOrder.getOrderItems()
                 .stream()
                 .map(orderItem ->
                         OrderItemResponseDto.FetchOrderDto.of(
-//                                findStore.getStoreName(),
-//                                findStore.getImgUrl(),
                                 itemMap.get(orderItem.getItemId()),
                                 itemImgMap.get(orderItem.getItemId()),
+                                itemUnitPriceMap.get(orderItem.getItemId()),
                                 orderItem))
                 .collect(Collectors.toList());
 

@@ -32,29 +32,31 @@ public class OrderItemResponseDto {
 //        private String storeImgUrl;     // 푸드트럭 이미지
         @ApiModelProperty(value = "Item ID")
         private Long itemId;            // 아이템 ID
+        @ApiModelProperty(value = "Item Image")
+        private String itemImgUrl;        // 아이템 이미지
         @ApiModelProperty(value = "Item Name")
         private String itemName;        // 아이템 이름
-        @ApiModelProperty(value = "Item Image")
-        private String itemImgUrl;        // 아이템 이름
         @ApiModelProperty(value = "Count")
         private int count;              // 개수
+
+        @ApiModelProperty(value = "Item UnitPrice")
+        private long unitPrice;
+
         @ApiModelProperty(value = "Total Price")
         private long totalPrice;        // 금액
 
         public static FetchOrderDto of(
-//                                        String storeName,
-//                                       String storeImgUrl,
                                        String itemName,
                                        String itemImgUrl,
+                                       long itemUnitPrice,
                                        OrderItem orderItem) {
             FetchOrderDto fetchOrderDto = new FetchOrderDto();
             fetchOrderDto.orderItemId = orderItem.getId();
-//            fetchOrderDto.storeName = storeName;
-//            fetchOrderDto.storeImgUrl = storeImgUrl;
             fetchOrderDto.itemId = orderItem.getItemId();
             fetchOrderDto.itemName = itemName;
             fetchOrderDto.itemImgUrl = itemImgUrl;
             fetchOrderDto.count = orderItem.getCount();
+            fetchOrderDto.unitPrice = itemUnitPrice;
             fetchOrderDto.totalPrice = orderItem.getTotalPrice();
 
             return fetchOrderDto;
