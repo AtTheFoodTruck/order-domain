@@ -30,7 +30,7 @@ public class OrderResponseDto {
         private OrderStatus orderStatus;    // 주문 상태
         private List<_OrderItems> orderItems;   // 아이템 목록
         private boolean hasReview;          // 리뷰 작성 여부
-        // 대기번호
+        private int waitingCount;           // 대기번호
 
         // 생성 메서드
         public static OrderHistory of(Order order) {
@@ -44,8 +44,10 @@ public class OrderResponseDto {
             orderHistory.orderItems = order.getOrderItems().stream()
                     .map(orderItem -> _OrderItems.of(orderItem))
                     .collect(Collectors.toList());
-            orderHistory.hasReview = order.getReview().isHasReview();
-            //대기번호
+            if (order.getReview() != null) {
+                orderHistory.hasReview = order.getReview().isHasReview();
+            }
+            orderHistory.waitingCount = order.getWaitingNum();      //대기번호
 
             return orderHistory;
         }

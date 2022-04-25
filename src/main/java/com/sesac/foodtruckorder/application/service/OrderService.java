@@ -379,16 +379,25 @@ public class OrderService {
 
     /**
      * 점주) 주문 접수
+     * 주문 접수 처리 후 store에 대기번호 +1, 주문 테이블에 대기번호 생성
      * @author jaemin
-     * @version 1.0.0
+     * @version 1.0.1
      * 작성일 2022/04/15
     **/
     @Transactional
-    public void acceptOrder(OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
+    public void acceptOrder(HttpServletRequest request, OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
+        String authorization = request.getHeader("Authorization");
+
         Long orderId = changeOrderStatus.getOrderId();
-        orderRepository.findByIdAndOrderStatus(orderId, OrderStatus.ORDER).orElseThrow(
+        Order findOrder = orderRepository.findByIdAndOrderStatus(orderId, OrderStatus.ORDER).orElseThrow(
                 () -> new OrderException("주문 정보를 찾을 수 없습니다.")
         ).changeAcceptOrder();
+
+        // 가게 정보 총 대기번호 +1 하고 대기번호를 받아옴
+        ResWaitingCount resWaitingCount = storeClient.saveWaitingCount(authorization, findOrder.getStoreId());
+
+        // 받아온 대기번호를 주문에 넣음
+        findOrder.changeWaitingCount(resWaitingCount.getCurrentWaitingCount());
     }
 
     /**

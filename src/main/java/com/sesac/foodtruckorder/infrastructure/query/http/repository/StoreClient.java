@@ -3,8 +3,12 @@ package com.sesac.foodtruckorder.infrastructure.query.http.repository;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetItemsInfoDto;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreInfoByUserId;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.ResWaitingCount;
 import com.sesac.foodtruckorder.infrastructure.query.http.dto.global.Result;
 import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,6 +76,16 @@ public interface StoreClient {
                        @RequestBody ReviewResponseDto.ResReviewInfoDto storeInfo);
 
     /**
+     * 가게 정보에 대기 번호 + 1
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/25
+    **/
+    @PostMapping("/api/v1/store/waiting/{storeId}")
+    ResWaitingCount saveWaitingCount(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
+                                     @PathVariable("storeId") Long storeId);
+
+    /**
      * 가게 이름 정보 조회
      * using by 리뷰 목록 조회
      * 재사용성을 위해 default 메서드 이용
@@ -134,4 +148,6 @@ public interface StoreClient {
                                 getItemsInfoDto -> getItemsInfoDto.getItemName())
                 );
     }
+
+
 }

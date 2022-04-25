@@ -224,8 +224,9 @@ public class OrderOwnerApiController {
      **/
     @Operation(summary = "점주) 주문 상태 변경 - 주문 접수")
     @PatchMapping("/orders/v1/owner/accept")
-    public ResponseEntity<?> acceptOrder(@RequestBody OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
-        orderService.acceptOrder(changeOrderStatus);
+    public ResponseEntity<?> acceptOrder(HttpServletRequest request,
+                                         @RequestBody OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
+        orderService.acceptOrder(request, changeOrderStatus);
 
         return response.success("주문 접수 완료");
     }
