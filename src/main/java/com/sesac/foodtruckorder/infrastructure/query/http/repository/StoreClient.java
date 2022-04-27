@@ -62,7 +62,8 @@ public interface StoreClient {
      * 작성일 2022/04/11
      **/
     @GetMapping("/api/v1/store/{userId}")
-    Result<GetStoreInfoByUserId> getStoreInfoByUserId(String authorization, @PathVariable("userId") Long userId);
+    Result<GetStoreInfoByUserId> getStoreInfoByUserId(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
+                                                      @PathVariable("userId") Long userId);
 
     /**
      * 리뷰 평점 저장
@@ -72,7 +73,7 @@ public interface StoreClient {
      * 작성일 2022/04/11
      **/
     @PostMapping("/api/v1/store/review")
-    void saveStoreInfo(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
+    void saveStoreInfos(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
                        @RequestBody ReviewResponseDto.ResReviewInfoDto storeInfo);
 
     /**

@@ -10,7 +10,6 @@ import lombok.Data;
  * 작성일 2022/04/11
  **/
 @Data
-@Builder
 public class GetStoreInfoByUserId {
     private Long storeId;
     private String storeName;

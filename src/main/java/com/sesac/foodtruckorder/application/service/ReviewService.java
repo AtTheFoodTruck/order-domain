@@ -136,7 +136,7 @@ public class ReviewService {
         ReviewResponseDto.ResReviewInfoDto reviewInfo = reviewRepositoryCustom.findReviewInfoByStoreId(storeId);
 
         // 6-2 가게 정보에 save
-        storeClient.saveStoreInfo(authorization, reviewInfo);
+        storeClient.saveStoreInfos(authorization, reviewInfo);
 
         return savedReview.getId();
     }
