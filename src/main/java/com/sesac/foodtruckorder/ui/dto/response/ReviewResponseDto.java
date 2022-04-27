@@ -99,7 +99,7 @@ public class ReviewResponseDto {
 
     /**
      * ReviewResponseDto 의 설명 적기
-     * @author jjaen
+     * @author jaemin
      * @version 1.0.0
      * 작성일 2022/04/14
      **/

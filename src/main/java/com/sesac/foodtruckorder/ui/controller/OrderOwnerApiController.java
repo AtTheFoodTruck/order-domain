@@ -47,7 +47,7 @@ public class OrderOwnerApiController {
     @Operation(summary = "점주) 주문 조회(접수) 페이지")
     @PostMapping("/orders/v1/owner/order")
     public ResponseEntity<?> orderMainPage(HttpServletRequest request,
-                                           @Valid OrderRequestDto.OrderSearchCondition condition,
+                                           @Valid @RequestBody OrderRequestDto.OrderSearchCondition condition,
                                            @PageableDefault(page = 0, size = 10) Pageable pageable) {
 
         OrderResponseDto.OrderMainDto orderMainPage = orderService.findOrderMainPage(request, condition, pageable);
@@ -109,6 +109,7 @@ public class OrderOwnerApiController {
      * @version 1.0.0
      * 작성일 2022/04/12
      **/
+    @Data
     static class _OrderItemResponse {
         private String itemName;
 
