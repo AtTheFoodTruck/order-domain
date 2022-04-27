@@ -88,6 +88,7 @@ public class OrderRepositoryCustom {
                                 review.id,
                                 review.rating,
                                 review.createdDate,
+                                review.images.imgUrl,
                                 order.orderPrice,
                                 review.content
                                 ))
