@@ -8,6 +8,7 @@ import com.sesac.foodtruckorder.ui.dto.request.OrderRequestDto;
 import com.sesac.foodtruckorder.ui.dto.response.OrderResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -156,6 +156,7 @@ public class OrderOwnerApiController {
     /** Dto 시작 **/
     /*******************************************************************************************************************/
 
+    @Data @AllArgsConstructor @NoArgsConstructor
     static class PrevOrderResponse {
         private List<_Order> orders;
         private OrderCustomerApiController.ResponseOrderHistory._Page page;
@@ -165,10 +166,11 @@ public class OrderOwnerApiController {
             page = new OrderCustomerApiController.ResponseOrderHistory._Page(startPage, totalPage);
         }
 
+        @Data @AllArgsConstructor @NoArgsConstructor
         static class _Order {
             private Long orderId;
             private OrderStatus orderStatus;
-            private LocalDateTime orderTime;
+            private String orderTime;
             private long orderPrice;
             private String userName;
             private List<_OrderItem> orderItems;
@@ -184,6 +186,7 @@ public class OrderOwnerApiController {
                 ).collect(Collectors.toList());
             }
 
+            @Data @AllArgsConstructor @NoArgsConstructor
             static class _OrderItem {
                 private Long orderItemId;
                 private String itemName;

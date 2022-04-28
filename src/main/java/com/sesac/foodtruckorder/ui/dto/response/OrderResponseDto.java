@@ -4,7 +4,6 @@ import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Order;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderItem;
 import com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.OrderStatus;
 import lombok.*;
-import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -183,7 +182,7 @@ public class OrderResponseDto {
     public static class PrevOrderDto {
         private Long orderId;
         private OrderStatus orderStatus;
-        private LocalDateTime orderTime;
+        private String orderTime;
         private long orderPrice;
         private Long userId;
         private String userName;
@@ -195,7 +194,8 @@ public class OrderResponseDto {
             PrevOrderDto prevOrderDto = new PrevOrderDto();
             prevOrderDto.orderId = order.getId();
             prevOrderDto.orderStatus = order.getOrderStatus();
-            prevOrderDto.orderTime = order.getOrderTime();
+            prevOrderDto.orderTime = order.getOrderTime()
+                    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             prevOrderDto.orderPrice = order.getOrderPrice();
             prevOrderDto.userId = order.getUserId();
 
