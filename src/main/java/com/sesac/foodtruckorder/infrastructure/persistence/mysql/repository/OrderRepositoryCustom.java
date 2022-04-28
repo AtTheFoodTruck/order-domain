@@ -147,10 +147,12 @@ public class OrderRepositoryCustom {
      * 작성일 2022/04/15
     **/
     public SliceImpl<Order> findOrderMain(Long storeId, OrderRequestDto.OrderSearchCondition condition, Pageable pageable) {
+        LocalDateTime orderStartTime = condition.getOrderStartTime();
+        LocalDateTime orderEndTime = condition.getOrderEndTime();
         List<Order> orders = queryFactory.selectFrom(order)
                 .where(
                         order.storeId.eq(storeId),
-                        order.orderTime.between(condition.getOrderStartTime(), condition.getOrderEndTime()),
+                        order.orderTime.between(orderStartTime, orderEndTime),
                         order.orderStatus.ne(OrderStatus.PENDING)
                 )
                 .orderBy(order.id.desc())
