@@ -239,7 +239,13 @@ public class OrderService {
 
         // 주문 정보 조회 -> Slice
 //        List<Order> findOrders = orderRepository.findOrderMainPage(start, end, storeInfo.getStoreId(), OrderStatus.PENDING, pageable).getContent();
-        SliceImpl<Order> findOrders = orderRepositoryCustom.findOrderMain(storeInfo.getStoreId(), condition, pageable);
+        SliceImpl<Order> findOrders = null;
+        try {
+            findOrders = orderRepositoryCustom.findOrderMain(storeInfo.getStoreId(), condition, pageable);
+        }catch (Exception e){
+            throw new OrderException(e.getMessage());
+        }
+
 
         // 사용자 정보, 아이템 정보 조회
         Set<Long> userIds = new HashSet<>();
@@ -260,15 +266,18 @@ public class OrderService {
         Map<Long, String> userNameMap = userClient.getUserNameMap(authorization, userIds);
 
         // item name 조회, dto에 추가
-        Map<Long, String> itemMap = storeClient.getItem(authorization, itemIds).getData().stream()
-                .collect(
-                        Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(), getItemsInfoDto -> getItemsInfoDto.getItemName())
-                );
+//        Map<Long, String> itemMap = storeClient.getItem(authorization, itemIds).getData().stream()
+//                .collect(
+//                        Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(), getItemsInfoDto -> getItemsInfoDto.getItemName())
+//                );
+
+        Map<Long, String> itemInfoMap = storeClient.getItemInfoMap(request, itemIds);
 
         for (OrderResponseDto._Order order : orders) {
             order.changeUserName(userNameMap.get(order.getUserId()));
             for (OrderResponseDto._OrderItem orderItem : order.getOrderItems()) {
-                orderItem.changeItemName(itemMap.get(orderItem.getItemId()));
+//                orderItem.changeItemName(itemMap.get(orderItem.getItemId()));
+                orderItem.changeItemName(itemInfoMap.get(orderItem.getItemId()));
             }
         }
 
