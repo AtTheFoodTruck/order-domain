@@ -138,11 +138,11 @@ public interface StoreClient {
      * 작성일 2022-04-09
      **/
     // 재사용성을 위해 default 메서드 이용
-    default Map<Long, String> getItemInfoMap(HttpServletRequest request, Set<Long> storeIds) {
+    default Map<Long, String> getItemInfoMap(HttpServletRequest request, Set<Long> itemIds) {
         String authorization = request.getHeader("Authorization");
 
-        if( !storeIds.iterator().hasNext()) return null;
-        List<GetItemsInfoDto> itemInfoMap = this.getItem(authorization, storeIds).getData();
+        if( !itemIds.iterator().hasNext()) return null;
+        List<GetItemsInfoDto> itemInfoMap = this.getItem(authorization, itemIds).getData();
         return itemInfoMap.stream()
                 .collect(
                         Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(),
