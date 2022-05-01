@@ -68,15 +68,18 @@ public class OrderRequestDto {
     @Data
     public static class PrevOrderSearch {
 
+//        @JsonProperty("user_id")
         private Long userId;
 
 //        @DateTimeFormat(pattern = "yyyy-MM-dd")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+//        @JsonProperty("start_date")
         @NotNull(message = "시작일은 필수 검색 조건입니다.")
         private LocalDate startDate;
 
 //        @DateTimeFormat(pattern = "yyyy-MM-dd")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+//        @JsonProperty("end_date")
         @NotNull(message = "종료일은 필수 검색 조건입니다.")
         private LocalDate endDate;
 
