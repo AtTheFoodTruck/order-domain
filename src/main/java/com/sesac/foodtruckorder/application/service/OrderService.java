@@ -197,13 +197,14 @@ public class OrderService {
                 Collectors.toMap(getStoreResponse -> getStoreResponse.getStoreId()
                         , getStoreResponse -> getStoreResponse.getStoreName())
         );
-        Map<Long, String> storeImgMap = data.stream().collect(
+        Map<Long, String> storeImgMap = data.stream().filter(obj -> Objects.nonNull(obj.getImgUrl())).collect(
                 Collectors.toMap(getStoreResponse -> getStoreResponse.getStoreId(),
                         getStoreResponse -> getStoreResponse.getImgUrl())
+
         );
 
 //        Map<Long, String> storeNameMap = storeClient.getStoreInfoMap(request, storeIds);            // 가게 정보 조회(StoreName)
-//        Map<Long, String> storeImgaeMap = storeClient.getStoreImageInfoMap(request, storeIds);      // 가게 정보 조회(StoreImageUrl)
+//        Map<Long, String> storeImgMap = storeClient.getStoreImageInfoMap(request, storeIds);      // 가게 정보 조회(StoreImageUrl)
 //        Result<List<GetItemsInfoDto>> itemNameMap = storeClient.getItem(authorization, itemIds);    // 아이템 정보 조회(itemName)
         Map<Long, String> itemInfoMap = storeClient.getItemInfoMap(request, itemIds);// 아이템 정보 조회(itemName)
 

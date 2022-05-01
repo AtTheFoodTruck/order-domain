@@ -11,13 +11,11 @@ import lombok.NoArgsConstructor;
  * 작성일 2022/04/11
 **/
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class GetStoreResponse {
     private Long storeId;       // 가게ID
     private String storeName;   // 가게명
     private String imgUrl;      // 가게 이미지 주소
-    private String imgName;
 
     public GetStoreResponse(Long storeId, String storeName, String imgUrl) {
         this.storeId = storeId;
