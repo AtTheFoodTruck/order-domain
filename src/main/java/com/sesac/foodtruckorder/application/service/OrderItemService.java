@@ -42,11 +42,6 @@ public class OrderItemService {
                 () -> new OrderException("장바구니 정보를 찾을 수 없습니다.")
         );
 
-        // 2. 아이템 조회
-//        OrderItem findOrderItem = orderItemRepository.findById(orderItemId).orElseThrow(
-//                () -> new OrderException("메뉴 정보를 찾을 수 없습니다. ")
-//        );
-
         // 3. 장바구니에서 아이템 삭제
         Order order = findOrder.deleteOrderItem(findOrderItem);
 
