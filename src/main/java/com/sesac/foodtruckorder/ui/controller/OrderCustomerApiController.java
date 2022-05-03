@@ -95,15 +95,16 @@ public class OrderCustomerApiController {
      * 작성일 2022-04-07
      **/
     @Operation(summary = "고객) 장바구니 아이템 삭제")
-    @DeleteMapping("/orders/v1/customer/carts")
-    public ResponseEntity<?> deleteOrderItem(@RequestBody OrderItemRequestDto.RequestDeleteItem requestDeleteItem) {
+    @DeleteMapping("/orders/v1/customer/carts/{orderItemId}")
+    public ResponseEntity<?> deleteOrderItem(@PathVariable("orderItemId") Long orderItemId) {
+            //@RequestBody OrderItemRequestDto.RequestDeleteItem requestDeleteItem) {
 
         // 장바구니에 존재하는 아이템 삭제
         // 장바구니의 크기가 0 이라면 order도 삭제
-        Long orderItemId = requestDeleteItem.getOrderItemId();
-        Long userId = requestDeleteItem.getUserId();
+//        Long orderItemId = requestDeleteItem.getOrderItemId();
+//        Long userId = requestDeleteItem.getUserId();
 
-        orderItemService.deleteOrderItem(orderItemId, userId);
+        orderItemService.deleteOrderItem(orderItemId);
 
         return response.success("", HttpStatus.NO_CONTENT);
     }
