@@ -33,14 +33,7 @@ import static com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity.Q
 public class OrderRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
-    /**
-     * 사용자) 주문 내역 조회
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-    **/
     public Page<Order> findOrderHistory(Pageable pageable, Long userId) {
-        // 카운트 쿼리
         Long count = queryFactory
                 .select(order.countDistinct())
                 .from(order)
@@ -49,7 +42,6 @@ public class OrderRepositoryCustom {
                         order.orderStatus.ne(OrderStatus.PENDING)
                 ).fetchOne();
 
-        // 데이터 쿼리
         List<Order> content = queryFactory.selectFrom(order)
                 .where(
                         order.userId.eq(userId),
@@ -64,15 +56,7 @@ public class OrderRepositoryCustom {
         return PageableExecutionUtils.getPage(content, pageable, () -> count);
     }
 
-    /**
-     * 사용자) 리뷰 목록 조회의 주문 정보
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-     **/
     public Page<ReviewResponseDto.ReviewHistoryDto> getReviewList(Pageable pageable, Long userId) {
-        // 1. storeImgUrl, storeName, order.orderPrice, order.orderTime, review.content, review.rating
-        // 카운트 쿼리
         Long count = queryFactory.select(order.countDistinct())
                 .from(order)
                 .join(order.review, review)
@@ -81,7 +65,6 @@ public class OrderRepositoryCustom {
                         order.orderStatus.eq(OrderStatus.COMPLETED)
                 ).fetchOne(); // 주문 정보가 4건
 
-        // 데이터 쿼리
         List<ReviewResponseDto.ReviewHistoryDto> content = queryFactory.select(
                         Projections.constructor(ReviewResponseDto.ReviewHistoryDto.class,
                                 review.storeId,
@@ -99,7 +82,6 @@ public class OrderRepositoryCustom {
                         order.orderStatus.eq(OrderStatus.COMPLETED)
 
                 )
-//                .orderBy(order.orderTime.desc())
                 .orderBy(review.createdDate.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -109,14 +91,7 @@ public class OrderRepositoryCustom {
         return PageableExecutionUtils.getPage(content, pageable, () -> count);
     }
 
-    /**
-     * 점주) 이전 주문 목록 조회 - Page
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-    **/
     public Page<Order> findPrevOrderList(OrderRequestDto.PrevOrderSearch prevOrderSearch, Pageable pageable, Long storeId) {
-        // 카운트 쿼리
         Long count = queryFactory.select(order.countDistinct())
                 .from(order)
                 .where(
@@ -125,7 +100,6 @@ public class OrderRepositoryCustom {
                         order.storeId.eq(storeId)
                 ).fetchOne();
 
-        // 데이터 쿼리
         List<Order> content = queryFactory.selectFrom(order)
                 .where(
                         order.orderTime.between(prevOrderSearch.getStartDateTime(), prevOrderSearch.getEndDateTime()),
@@ -140,12 +114,6 @@ public class OrderRepositoryCustom {
         return PageableExecutionUtils.getPage(content, pageable, () -> count);
     }
 
-    /**
-     * 주문 접수 페이지
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-    **/
     public SliceImpl<Order> findOrderMain(Long storeId, OrderRequestDto.OrderSearchCondition condition, Pageable pageable) {
         LocalDateTime orderStartTime = condition.getOrderStartTime();
         LocalDateTime orderEndTime = condition.getOrderEndTime();

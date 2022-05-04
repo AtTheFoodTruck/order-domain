@@ -19,5 +19,5 @@ public class CreateUserDto {
     private String username;
     private String phoneNum;
     private boolean activated;
-    private String bNo; // 사업자등록번호
+    private String bNo;
 }

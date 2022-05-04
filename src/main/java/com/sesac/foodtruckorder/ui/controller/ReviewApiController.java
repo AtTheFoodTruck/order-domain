@@ -39,13 +39,6 @@ public class ReviewApiController {
     private final Response response;
     private final Helper helper;
 
-    /**
-     * 사용자) Review 목록 조회
-     * @author jaemin
-     * pathvariable
-     * @version 1.0.1
-     * 작성일 2022-04-08
-     **/
     @Operation(summary = "고객) 고객이 작성한 리뷰 목록 조회")
     @GetMapping("/orders/v1/customer/reviews/{user_id}")
     public ResponseEntity<?> findReviews(HttpServletRequest request,
@@ -59,12 +52,6 @@ public class ReviewApiController {
         return response.success(responseReviewHistory);
     }
 
-    /**
-     * 사용자) 리뷰 목록 조회 응답 DTO
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-    **/
     @Data
     @NoArgsConstructor
     static class ResponseReviewHistory {
@@ -77,20 +64,12 @@ public class ReviewApiController {
         }
     }
 
-
-    /**
-     * Review 생성
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022-04-08
-     **/
     @Operation(summary = "고객) 리뷰 생성")
     @PostMapping("/orders/v1/customer/reviews")
     public ResponseEntity<?> createReview(HttpServletRequest request,
                                           @RequestBody ReviewRequestDto.RequestReviewForm requestReviewForm,
                                           @Valid BindingResult results) {
 
-        // validation check
         if (results.hasErrors()) {
             return response.invalidFields(helper.refineErrors(results));
         }
@@ -116,14 +95,6 @@ public class ReviewApiController {
         private Double ratingAvg;
     }
 
-
-
-    /**
-     * Review 삭제
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022-04-08
-     **/
     @Operation(summary = "고객) 리뷰 삭제")
     @DeleteMapping("/orders/v1/customer/reviews")
     public ResponseEntity<?> deleteReview(@RequestBody ReviewRequestDto.DeleteReview deleteReview) {
@@ -134,14 +105,6 @@ public class ReviewApiController {
         return reviewService.deleteReview(userId, reviewId);
     }
 
-
-    /**
-     * 점주) 리뷰 목록 조회
-     * @author jaemin
-     * get -> post
-     * @version 1.0.1
-     * 작성일 2022/04/13
-     **/
     @Operation(summary = "점주) 리뷰 목록 조회")
     @PostMapping("/orders/v1/owner/reviews")
     public ResponseEntity<?> getStoreReviewList(HttpServletRequest request,
@@ -155,12 +118,6 @@ public class ReviewApiController {
         return response.success(responseStoreReview);
     }
 
-    /**
-     * 점주) 리뷰 목록 응답 dto
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-    **/
     @Data @AllArgsConstructor @NoArgsConstructor
     static class ResponseStoreReview {
         private List<ReviewResponseDto.ResOwnerReviewList> reviews;

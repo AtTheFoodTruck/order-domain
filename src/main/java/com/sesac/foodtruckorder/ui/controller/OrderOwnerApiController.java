@@ -37,13 +37,6 @@ public class OrderOwnerApiController {
     private final OrderService orderService;
     private final Response response;
 
-    /**
-     * 점주) 주문 조회(접수) 페이지
-     * @author jaemin
-     * get -> post
-     * @version 1.0.1
-     * 작성일 2022/04/03
-    **/
     @Operation(summary = "점주) 주문 조회(접수) 페이지")
     @PostMapping("/orders/v1/owner/order")
     public ResponseEntity<?> orderMainPage(HttpServletRequest request,
@@ -58,14 +51,6 @@ public class OrderOwnerApiController {
         return response.success(orderMainResponse);
     }
 
-    /** Dto 시작 **/
-    /*******************************************************************************************************************/
-    /**
-     * 주문 조회 페이지(점주) 화면에 fit한 dto 생성
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/12
-    **/
     @Data @NoArgsConstructor
     static class OrderMainResponse {
         private List<_OrderResponse> orderList;
@@ -77,12 +62,6 @@ public class OrderOwnerApiController {
         }
     }
 
-    /**
-     * 주문 조회 페이지(점주) 화면에 fit한 dto 생성
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/12
-     **/
     @Data @NoArgsConstructor
     static class _OrderResponse {
         private Long orderId;
@@ -103,12 +82,6 @@ public class OrderOwnerApiController {
         }
     }
 
-    /**
-     * 주문 조회 페이지(점주) 화면에 fit한 dto 생성
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/12
-     **/
     @Data
     static class _OrderItemResponse {
         private String itemName;
@@ -117,28 +90,17 @@ public class OrderOwnerApiController {
             this.itemName = orderItem.getItemName();
         }
     }
-    /*******************************************************************************************************************/
-    /** Dto 끝 **/
 
-    /**
-     * 이전 주문 내역 조회
-     * @author jaemin
-     * get -> post
-     * @version 1.0.1
-     * 작성일 2022/04/12
-     **/
     @Operation(summary = "점주) 이전 주문 내역 조회")
     @PostMapping("/orders/v1/owner/prev-order")
     public ResponseEntity<?> getPrevOrderList(HttpServletRequest request,
                                               @Valid @RequestBody OrderRequestDto.PrevOrderSearch prevOrderSearch,
                                               BindingResult results,
                                               @PageableDefault(page = 0, size = 10) Pageable pageable) {
-        // validation check
         if (results.hasErrors()) {
             response.invalidFields(Helper.refineErrors(results));
         }
 
-        // 시작일, 종료일 validation check
         LocalDate startDate = prevOrderSearch.getStartDate();
         LocalDate endDate = prevOrderSearch.getEndDate();
 
@@ -146,15 +108,11 @@ public class OrderOwnerApiController {
             response.fail("시작일은 종료일보다 클 수 없습니다.", HttpStatus.BAD_REQUEST);
         }
 
-//        List<OrderResponseDto.PrevOrderDto> prevOrderList = orderService.findPrevOrderList(request, prevOrderSearch, pageable);
         Page<OrderResponseDto.PrevOrderDto> prevOrderList = orderService.findPrevOrderList(request, prevOrderSearch, pageable);
-        // orderId, orderStatus, orderTime, orderItemId, itemName, orderTotalPrice, userName
         PrevOrderResponse prevOrderResponse = new PrevOrderResponse(prevOrderList.getContent(), prevOrderList.getNumber(), prevOrderList.getTotalPages());
 
         return response.success(prevOrderResponse);
     }
-    /** Dto 시작 **/
-    /*******************************************************************************************************************/
 
     @Data @AllArgsConstructor @NoArgsConstructor
     static class PrevOrderResponse {
@@ -200,16 +158,7 @@ public class OrderOwnerApiController {
         }
 
     }
-    /*******************************************************************************************************************/
-    /** Dto 끝 **/
 
-    /**
-     * 주문 상세 보기
-     * @author jaemin
-     * pathvariable
-     * @version 1.0.1
-     * 작성일 2022/04/12
-     **/
     @Operation(summary = "점주) 주문내역 상세 보기")
     @GetMapping("/orders/v1/owner/order-detail/{order_id}")
     public ResponseEntity<?> getOrderDetail(HttpServletRequest request,
@@ -220,12 +169,6 @@ public class OrderOwnerApiController {
         return response.success(orderDetail);
     }
 
-    /**
-     * 점주) 주문 접수 api
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-     **/
     @Operation(summary = "점주) 주문 상태 변경 - 주문 접수")
     @PatchMapping("/orders/v1/owner/accept")
     public ResponseEntity<?> acceptOrder(HttpServletRequest request,
@@ -235,12 +178,6 @@ public class OrderOwnerApiController {
         return response.success("주문 접수 완료");
     }
 
-    /**
-     * 점주) 주문 거절 api
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-     **/
     @Operation(summary = "점주) 주문 상태 변경 - 주문 거절")
     @PatchMapping("/orders/v1/owner/reject")
     public ResponseEntity<?> rejectOrder(@RequestBody OrderRequestDto.ChangeOrderStatus changeOrderStatus) {
@@ -249,12 +186,6 @@ public class OrderOwnerApiController {
         return response.success("주문 접수 거절");
     }
 
-    /**
-     * 점주) 조리 완료 api
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-     **/
     @Operation(summary = "점주) 주문 상태 변경 - 조리 완료")
     @PatchMapping("/orders/v1/owner/complete")
     public ResponseEntity<?> completeOrder(@RequestBody OrderRequestDto.ChangeOrderStatus changeOrderStatus) {

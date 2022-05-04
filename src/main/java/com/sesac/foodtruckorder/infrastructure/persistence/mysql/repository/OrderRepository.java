@@ -33,6 +33,4 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findByIdAndOrderStatus(Long orderId, OrderStatus orderStatus);
 
-//    @Query("select o from Order o where o.userId=:userId and o.orderStatus=:orderStatus")
-//    Page<Order> findByReviews(Pageable pageable, Long userId, OrderStatus orderStatus);
 }

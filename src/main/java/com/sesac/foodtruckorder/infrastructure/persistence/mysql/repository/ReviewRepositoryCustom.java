@@ -23,12 +23,6 @@ public class ReviewRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    /**
-     * 별점 평균 구하기
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-    **/
     public List<ReviewResponseDto.ResReviewInfoDto> findAllByStoreIds(List<Long> storeIds) {
         return queryFactory.select(
                         Projections.constructor(ReviewResponseDto.ResReviewInfoDto.class,
@@ -42,21 +36,13 @@ public class ReviewRepositoryCustom {
                 .fetch();
     }
 
-    /**
-     * 점주) 리뷰 목록 조회
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-     **/
     public Page<Review> findOwnerReviewList(Pageable pageable, Long storeId) {
-        // 카운트 쿼리
         Long count = queryFactory.select(review.countDistinct())
                 .from(review)
                 .where(
                         review.storeId.eq(storeId)
                 ).fetchOne();
 
-        // 데이터 쿼리
         List<Review> content = queryFactory.selectFrom(review)
                 .where(
                         review.storeId.eq(storeId)
@@ -68,12 +54,7 @@ public class ReviewRepositoryCustom {
 
         return PageableExecutionUtils.getPage(content, pageable, () -> count);
     }
-    /**
-     * 별점 평균 구하기 - 단건
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/15
-     **/
+
     public ReviewResponseDto.ResReviewInfoDto findReviewInfoByStoreId(Long storeId) {
 
         return queryFactory.select(

@@ -22,12 +22,6 @@ public class OrderItemService {
     private final OrderItemRepository orderItemRepository;
     private final OrderRepository orderRepository;
 
-    /**
-     * 장바구니 삭제
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022-04-09
-    **/
     @Transactional
     public void deleteOrderItem(Long orderItemId) {
 

@@ -16,26 +16,20 @@ public class Review extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
-    private Long id;            // ReviewID
-    private String content;     // 리뷰 내용
-    private Double rating;      // 리뷰 별점
+    private Long id;
+    private String content;
+    private Double rating;
     private boolean hasReview;  // 리뷰 작성여부
 
     @Embedded
     private Images images;
-
-    // User
     private Long userId;
-
-    // Store
     private Long storeId;
 
-    // order
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
-    /** 생성 메서드 **/
     public static Review of(Long userId, Long storeId, ReviewRequestDto.ReviewDto reviewDto, Images images, Order order) {
         Review review = new Review();
         review.content = reviewDto.getContent();

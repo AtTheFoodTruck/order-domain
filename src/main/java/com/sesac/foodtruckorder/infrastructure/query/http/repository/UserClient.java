@@ -13,13 +13,6 @@ import java.util.stream.Collectors;
 @FeignClient(name = "user-service") //apigateway에 등록된 ApplicationName
 public interface UserClient {
 
-    /**
-     * User Domain에서 user정보 받아오기
-     * userId, userName
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022-04-09
-     **/
     @GetMapping("/api/v1/info/{userIds}")
     Result<List<GetUserNameMap>> getUsers(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
                                           @PathVariable("userIds") Iterable<Long> userIds);
@@ -36,12 +29,6 @@ public interface UserClient {
 
     }
 
-    /**
-     * User Domain에서 user정보 받아오기
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022-04-09
-     **/
     @GetMapping("/api/v1/info/{userId}")
     CreateUserDto userInfo(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
                            @PathVariable("userId") Long userId);

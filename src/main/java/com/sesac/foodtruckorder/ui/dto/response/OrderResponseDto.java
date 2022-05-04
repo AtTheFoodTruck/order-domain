@@ -12,26 +12,19 @@ import java.util.stream.Collectors;
 
 public class OrderResponseDto {
 
-    /**
-     * 주문 내역 조회 응답 DTO
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022-04-10
-     **/
     @Data
     public static class OrderHistory {
-        private Long orderId;			    // 주문 ID
-        private Long storeId;               // 가게 ID
-        private String storeImgUrl;		    // 가게 이미지 URL
-        private String storeName;		    // 가게 이름
-        private long totalPrice;		    // 총 주문 가격
-        private String orderTime;           // 주문 날짜
-        private OrderStatus orderStatus;    // 주문 상태
-        private List<_OrderItems> orderItems;   // 아이템 목록
-        private boolean hasReview;          // 리뷰 작성 여부
-        private int waitingCount;           // 대기번호
+        private Long orderId;
+        private Long storeId;
+        private String storeImgUrl;
+        private String storeName;
+        private long totalPrice;
+        private String orderTime;
+        private OrderStatus orderStatus;
+        private List<_OrderItems> orderItems;
+        private boolean hasReview;
+        private int waitingCount;
 
-        // 생성 메서드
         public static OrderHistory of(Order order) {
             OrderHistory orderHistory = new OrderHistory();
             orderHistory.orderId = order.getId();
@@ -46,7 +39,7 @@ public class OrderResponseDto {
             if (order.getReview() != null) {
                 orderHistory.hasReview = order.getReview().isHasReview();
             }
-            orderHistory.waitingCount = order.getWaitingNum();      //대기번호
+            orderHistory.waitingCount = order.getWaitingNum();
 
             return orderHistory;
         }
@@ -60,19 +53,12 @@ public class OrderResponseDto {
         }
     }
 
-    /**
-     * 주문 내역 조회에 사용될 아이템 목록 dto
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/11
-    **/
     @Data
     public static class _OrderItems {
         private Long orderItemId;
         private Long itemId;
         private String itemName;
 
-        // 생성 메서드
         public static _OrderItems of(OrderItem orderItem) {
             _OrderItems orderItems = new _OrderItems();
             orderItems.orderItemId = orderItem.getId();
@@ -86,14 +72,6 @@ public class OrderResponseDto {
         }
     }
 
-
-
-    /**
-     * OrderMainDto
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/12
-    **/
     @Data
     public static class OrderMainDto{
         private List<_Order> orders;
@@ -112,12 +90,6 @@ public class OrderResponseDto {
         }
     }
 
-    /**
-     * OrderMainDto - List<Order> dto
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/12
-    **/
     @Data
     public static class _Order {
         private Long orderId;
@@ -127,7 +99,6 @@ public class OrderResponseDto {
         private List<_OrderItem> orderItems;
         private String userName;
 
-        // 생성 메서드
         public static _Order of(Order order) {
             _Order orderDto = new _Order();
             orderDto.orderId = order.getId();
@@ -146,12 +117,6 @@ public class OrderResponseDto {
         }
     }
 
-    /**
-     * OrderMainDto - List<_Order> - List<_OrderItem>
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/12
-    **/
     @Data
     public static class _OrderItem {
         private Long orderItemId;
@@ -171,13 +136,6 @@ public class OrderResponseDto {
         }
     }
 
-    /**
-     * 이전 주문 내역 조회
-     *
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/12
-     **/
     @Data
     public static class PrevOrderDto {
         private Long orderId;
@@ -215,7 +173,6 @@ public class OrderResponseDto {
             private Long itemId;
             private String itemName;
 
-            // 생성 메서드
             public static _PrevOrderItem of(OrderItem orderItem) {
                 _PrevOrderItem prevOrderItem = new _PrevOrderItem();
                 prevOrderItem.orderItemId = orderItem.getId();
@@ -230,12 +187,6 @@ public class OrderResponseDto {
         }
     }
 
-    /**
-     * 이전 내역 조회 dto
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/12
-     **/
     @Data
     public static class OrderDetailDto {
         private Long orderId;
@@ -292,7 +243,6 @@ public class OrderResponseDto {
             this.count = count;
         }
 
-        // 생성 메서드
         public static OrderDetailItem of(OrderItem orderItem) {
             OrderDetailItem orderDetailItem = new OrderDetailItem();
             orderDetailItem.orderItemId = orderItem.getId();

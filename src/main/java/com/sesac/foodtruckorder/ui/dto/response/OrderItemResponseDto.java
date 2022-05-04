@@ -11,12 +11,6 @@ import java.util.List;
 @Schema(description = "장바구니 response DTO")
 public class OrderItemResponseDto {
 
-    /**
-     * 장바구니 목록 조회 응답 Dto
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022-04-09
-    **/
     @Schema(description = "장바구니 내역 조회")
     @Getter
     @NoArgsConstructor
@@ -25,25 +19,21 @@ public class OrderItemResponseDto {
     public static class FetchOrderDto {
         @Schema(description = "OrderItem ID")
         @ApiModelProperty(value = "OrderItem ID")
-        private Long orderItemId;       // OrderItemId
-//        @ApiModelProperty(value = "Store Name")
-//        private String storeName;       // 푸드트럭 명
-//        @ApiModelProperty(value = "Store Image URL")
-//        private String storeImgUrl;     // 푸드트럭 이미지
+        private Long orderItemId;
         @ApiModelProperty(value = "Item ID")
-        private Long itemId;            // 아이템 ID
+        private Long itemId;
         @ApiModelProperty(value = "Item Image")
-        private String itemImgUrl;        // 아이템 이미지
+        private String itemImgUrl;
         @ApiModelProperty(value = "Item Name")
-        private String itemName;        // 아이템 이름
+        private String itemName;
         @ApiModelProperty(value = "Count")
-        private int count;              // 개수
+        private int count;
 
         @ApiModelProperty(value = "Item UnitPrice")
         private long unitPrice;
 
         @ApiModelProperty(value = "Total Price")
-        private long totalPrice;        // 금액
+        private long totalPrice;
 
         public static FetchOrderDto of(
                                        String itemName,
@@ -63,12 +53,6 @@ public class OrderItemResponseDto {
         }
     }
 
-    /**
-     * 최종 장바구니 내역 조회 response dto
-     * @author jaemin
-     * @version 1.0.0
-     * 작성일 2022/04/22
-     **/
     @Data @NoArgsConstructor
     public static class ResCartListDto {
         private String storeName;           // 가게명

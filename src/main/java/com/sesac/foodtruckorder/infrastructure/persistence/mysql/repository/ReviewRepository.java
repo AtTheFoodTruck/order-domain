@@ -21,7 +21,4 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Page<Review> findByStoreIdOrderByCreatedDateDesc(Long storeId, Pageable pageable);
 
-//    List<Review> findAllByStoreId(Iterable<Long> storeIds);
-
-//    Page<Review> findByStoreId(Long storeId, Pageable pageable);
 }
