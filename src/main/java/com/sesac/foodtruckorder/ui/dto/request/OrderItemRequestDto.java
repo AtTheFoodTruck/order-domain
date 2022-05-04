@@ -4,7 +4,19 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 
-public class RequestItemDto {
+public class OrderItemRequestDto {
+
+    /**
+     * 장바구니 목록 조회 요청 DTO
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022-04-09
+     **/
+    @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @Data
+    public static class RequestOrderItemList {
+        private Long userId;
+    }
 
     /**
      * 장바구니에 아이템 담기 요청 폼 DTO
@@ -12,17 +24,18 @@ public class RequestItemDto {
      * @version 1.0.0
      * 작성일 2022-04-07
      **/
+    @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
-    public class RequestItem {
+    public static class RequestItem {
         private Long itemId;    // 상품ID
-        private int price;     // 상품 가격
-        private int count;     // 상품 수량
-        private Long storeId;   // 가게ID
+        private int price;      // 상품 가격
+        private int count;      // 상품 수량
         private Long userId;    // 유저ID
+        private Long storeId;   // 가게ID
     }
 
     /**
-     * 장바구니에 상품 담기 DTO
+     * 장바구니에 아이템 담기 DTO
      *
      * @author jaemin
      * @version 1.0.0
@@ -34,24 +47,24 @@ public class RequestItemDto {
     @AllArgsConstructor
     @Builder
     public static class OrderItemDto {
-        private Long cartItemId;    // cartItem ID
+        private Long orderItemId;    // cartItem ID
         private Long storeId;       // 가게 ID
         private Long itemId;        // 상품 ID
-//        private String itemName;    // 상품 Name
-        private int unitPrice;      // 상품 단위 가격
         private int count;          // 상품 수량
+        private int unitPrice;      // 상품 단위 가격
+//        private String itemName;    // 상품 Name
 
         // cartItem_id, item_id, price, count
-        public static OrderItemDto of(Long cartItemId, Long storeId, Long itemId,
+        public static OrderItemDto of(Long orderItemId, Long storeId, Long itemId,
                                       int unitPrice, int count) {
-            return OrderItemDto.builder()
-                    .cartItemId(cartItemId)
-                    .storeId(storeId)
-                    .itemId(itemId)
-//                    .itemName(itemName)
-                    .unitPrice(unitPrice)
-                    .count(count)
-                    .build();
+            OrderItemDto orderItemDto = new OrderItemDto();
+            orderItemDto.orderItemId = orderItemId;
+            orderItemDto.storeId = storeId;
+            orderItemDto.itemId = itemId;
+            orderItemDto.unitPrice = unitPrice;
+            orderItemDto.count = count;
+
+            return orderItemDto;
         }
     }
 
@@ -77,6 +90,7 @@ public class RequestItemDto {
     @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
     @Data
     public static class RequestCountItem {
+        private Long orderId;
         private Long orderItemId;
         private boolean plusMinus;
     }

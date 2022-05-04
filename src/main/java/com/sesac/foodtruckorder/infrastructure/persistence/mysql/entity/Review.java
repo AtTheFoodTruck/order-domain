@@ -1,5 +1,6 @@
 package com.sesac.foodtruckorder.infrastructure.persistence.mysql.entity;
 
+import com.sesac.foodtruckorder.ui.dto.request.ReviewRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,17 +16,37 @@ public class Review extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_id")
-    private Long id;
-    private String content;
-    private int rating;
+    private Long id;            // ReviewID
+    private String content;     // 리뷰 내용
+    private Double rating;      // 리뷰 별점
+    private boolean hasReview;  // 리뷰 작성여부
+
+    @Embedded
+    private Images images;
+
     // User
     private Long userId;
 
     // Store
     private Long storeId;
 
-    // Order
-    @OneToOne(mappedBy = "review", fetch = LAZY)
+    // order
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "order_id")
     private Order order;
+
+    /** 생성 메서드 **/
+    public static Review of(Long userId, Long storeId, ReviewRequestDto.ReviewDto reviewDto, Images images, Order order) {
+        Review review = new Review();
+        review.content = reviewDto.getContent();
+        review.rating = reviewDto.getRating();
+        review.images = images;
+        review.userId = userId;
+        review.storeId = storeId;
+        review.order = order;
+        review.hasReview = true;
+
+        return review;
+    }
 
 }

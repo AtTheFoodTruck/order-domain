@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StoreInfo {
-
-    private Long userId;
-    private Long storeId;
+public class ResWaitingCount {
+    private int currentWaitingCount;
 }

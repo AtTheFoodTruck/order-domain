@@ -3,21 +3,27 @@ server:
 
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/foodtruck
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-  #  main:
-  #    web-application-type: reactive
+    url: jdbc:mysql://userdb:3306/orderdb?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false&zeroDateTimeBehavior=CONVERT_TO_NULL
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+#    url: jdbc:h2:tcp://localhost/~/foodtruck
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
+#    main:
+#      web-application-type: reactive
   application:
     name: order-service
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 1000 #??? ??
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
 logging:
   level:
@@ -40,3 +46,4 @@ management:
         include: beans, health, busrefresh, refresh
 
 #debug: true
+

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Schema(description = "로그인 요청")
+@Schema(description = "응답")
 @Component
 public class Response {
 

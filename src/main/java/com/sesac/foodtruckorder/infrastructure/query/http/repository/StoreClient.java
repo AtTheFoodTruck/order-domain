@@ -1,17 +1,154 @@
 package com.sesac.foodtruckorder.infrastructure.query.http.repository;
 
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetItemsInfoDto;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreResponse;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.GetStoreInfoByUserId;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.ResWaitingCount;
+import com.sesac.foodtruckorder.infrastructure.query.http.dto.global.Result;
+import com.sesac.foodtruckorder.ui.dto.response.ReviewResponseDto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "user-service") //apigateway에 등록된 ApplicationName
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@FeignClient(name = "item-service") //apigateway에 등록된 ApplicationName
 public interface StoreClient {
 
-    /*@GetMapping("/users/info/{userId}")
-    CreateUserDto userInfo(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
-                           @PathVariable("userId") Long userId);
+    /**
+     * 리뷰 목록 조회(가게입장), 주문 내역 조회
+     * 가게 정보 조회 - 다중
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/11
+    **/
+    @GetMapping("/api/v1/store/reviews/{storeIds}")
+    Result<List<GetStoreResponse>> getStoreNameImageMap(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
+                                                        @PathVariable("storeIds") Iterable<Long> storeIds);
 
-    // 점주에 가게정보 업데이트 메서드
-    @PostMapping("/users/stores")
-    void saveStoreInfo(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
-                              @RequestBody StoreInfo storeInfo);*/
+    /**
+     * 장바구니 내역 조회
+     * 가게 정보 조회 - 단건
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/11
+    **/
+    @GetMapping("/api/v1/store/cart/{storeId}")
+    Result<GetStoreResponse> getStore(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
+                                      @PathVariable("storeId") String storeId);
+
+    /**
+     * 장바구니 내역 조회, 아이템 정보 조회
+     * itemId, itemName
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/11
+    **/
+    @GetMapping("/api/v1/item/{itemId}")
+    Result<List<GetItemsInfoDto>> getItem(@RequestHeader(value = "Authorization", required = true) String authorizationHeader,
+                                          @PathVariable("itemId") Iterable<Long> itemIds);
+
+    /**
+     * 가게 정보 조회
+     * using by 주문 조회 페이지 (점주)
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/11
+     **/
+    @GetMapping("/api/v1/store/{userId}")
+    Result<GetStoreInfoByUserId> getStoreInfoByUserId(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
+                                                      @PathVariable("userId") Long userId);
+
+    /**
+     * 리뷰 평점 저장
+     * using by 주문 조회 페이지 (점주)
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/11
+     **/
+    @PostMapping("/api/v1/store/review")
+    void saveStoreInfos(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
+                       @RequestBody ReviewResponseDto.ResReviewInfoDto storeInfo);
+
+    /**
+     * 가게 정보에 대기 번호 + 1
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022/04/25
+    **/
+    @PostMapping("/api/v1/store/waiting/{storeId}")
+    ResWaitingCount saveWaitingCount(@RequestHeader(value="Authorization", required = true) String authorizationHeader,
+                                     @PathVariable("storeId") Long storeId);
+
+    /**
+     * 가게 이름 정보 조회
+     * using by 리뷰 목록 조회
+     * 재사용성을 위해 default 메서드 이용
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022-04-09
+    **/
+    // 재사용성을 위해 default 메서드 이용
+    default Map<Long, String> getStoreInfoMap(HttpServletRequest request, Set<Long> storeIds) {
+        String authorization = request.getHeader("Authorization");
+
+        if( !storeIds.iterator().hasNext()) return null;
+        List<GetStoreResponse> storeResponses = this.getStoreNameImageMap(authorization, storeIds).getData();
+        return storeResponses.stream()
+                .collect(
+                        Collectors.toMap(getStoreResponse -> getStoreResponse.getStoreId(),
+                                getStoreResponse -> getStoreResponse.getStoreName())
+                );
+    }
+
+    /**
+     * 가게 이미지 주소 정보 조회
+     * using by 장바구니 목록 조회, 주문 내역 조회
+     * 재사용성을 위해 default 메서드 이용
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022-04-09
+     **/
+    // 재사용성을 위해 default 메서드 이용
+    default Map<Long, String> getStoreImageInfoMap(HttpServletRequest request, Set<Long> storeIds) {
+        String authorization = request.getHeader("Authorization");
+
+        if( !storeIds.iterator().hasNext()) return null;
+        List<GetStoreResponse> storeResponses = this.getStoreNameImageMap(authorization, storeIds).getData();
+        return storeResponses.stream()
+                .collect(
+                        Collectors.toMap(getStoreResponse -> getStoreResponse.getStoreId(),
+                                getStoreResponse -> getStoreResponse.getImgUrl())
+                );
+    }
+
+
+
+    /**
+     * 아이템 정보 조회
+     * 재사용성을 위해 default 메서드 이용
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022-04-09
+     **/
+    // 재사용성을 위해 default 메서드 이용
+    default Map<Long, String> getItemInfoMap(HttpServletRequest request, Set<Long> itemIds) {
+        String authorization = request.getHeader("Authorization");
+
+        if( !itemIds.iterator().hasNext()) return null;
+        List<GetItemsInfoDto> itemInfoMap = this.getItem(authorization, itemIds).getData();
+        return itemInfoMap.stream()
+                .collect(
+                        Collectors.toMap(getItemsInfoDto -> getItemsInfoDto.getItemId(),
+                                getItemsInfoDto -> getItemsInfoDto.getItemName())
+                );
+    }
+
+
 }

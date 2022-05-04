@@ -22,16 +22,24 @@ public class OrderItemService {
     private final OrderItemRepository orderItemRepository;
     private final OrderRepository orderRepository;
 
-    public void deleteOrderItem(Long orderItemId, Long userId) {
+    /**
+     * 장바구니 삭제
+     * @author jaemin
+     * @version 1.0.0
+     * 작성일 2022-04-09
+    **/
+    @Transactional
+    public void deleteOrderItem(Long orderItemId) {
 
         // 1. 장바구니 조회
-        Order findOrder = orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.PENDING).orElseThrow(
+        OrderItem findOrderItem = orderItemRepository.findById(orderItemId).orElseThrow(
                 () -> new OrderException("장바구니 정보를 찾을 수 없습니다.")
         );
 
-        // 2. 아이템 조회
-        OrderItem findOrderItem = orderItemRepository.findById(orderItemId).orElseThrow(
-                () -> new OrderException("메뉴 정보를 찾을 수 없습니다. ")
+        Long userId = findOrderItem.getOrder().getUserId();
+
+        Order findOrder = orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.PENDING).orElseThrow(
+                () -> new OrderException("장바구니 정보를 찾을 수 없습니다.")
         );
 
         // 3. 장바구니에서 아이템 삭제
