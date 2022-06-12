@@ -2,20 +2,21 @@ server:
   port: 8889
 
 spring:
+  application:
+    name: order-service
+
   datasource:
     url: jdbc:mysql://userdb:3306/orderdb?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false&zeroDateTimeBehavior=CONVERT_TO_NULL
     username: root
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
-
 #    url: jdbc:h2:tcp://localhost/~/foodtruck
 #    username: sa
 #    password:
 #    driver-class-name: org.h2.Driver
 #    main:
 #      web-application-type: reactive
-  application:
-    name: order-service
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -44,6 +45,10 @@ management:
     web:
       exposure:
         include: beans, health, busrefresh, refresh
+
+kafka:
+  host: 10.10.10.203
+  port: 9092
 
 #debug: true
 
