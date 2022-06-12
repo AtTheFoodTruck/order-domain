@@ -168,8 +168,6 @@ public class OrderService {
     **/
     public Page<OrderResponseDto.OrderHistory> findOrderHistory(Pageable pageable, HttpServletRequest request, Long userId) {
         String authorization = request.getHeader("Authorization");
-        // 주문 정보 조회 - 페이징
-//        Page<Order> findOrder = orderRepository.findByUserIdAndPaging(pageable, userId, OrderStatus.PENDING);
         // 주문 내역 조회 - QueryDsl - refactoring
         Page<Order> findOrder = orderRepositoryCustom.findOrderHistory(pageable, userId);
 
@@ -178,11 +176,11 @@ public class OrderService {
                 .map(order -> OrderResponseDto.OrderHistory.of(order))
                 .collect(Collectors.toList());
 
+        // Primary Key를 Set 객체에 저장
         Set<Long> storeIds = new HashSet<>();
         Set<Long> itemIds = new HashSet<>();
 
         // 주문한 storeId, itemId set객체에 저장
-
         for (OrderResponseDto.OrderHistory orderHistory : orderHistoryList) {
             storeIds.add(orderHistory.getStoreId());
             for (OrderResponseDto._OrderItems orderItems : orderHistory.getOrderItems()) {
@@ -190,8 +188,9 @@ public class OrderService {
             }
         }
 
-        // store, item 정보 추출, storeName, itemName
+        // 한 방에 Feign 통신
         List<GetStoreResponse> data = storeClient.getStoreNameImageMap(authorization, storeIds).getData();
+        Map<Long, String> itemInfoMap = storeClient.getItemInfoMap(request, itemIds);// 아이템 정보 조회(itemName)
 
         Map<Long, String> storeNameMap = data.stream().collect(
                 Collectors.toMap(getStoreResponse -> getStoreResponse.getStoreId()
@@ -206,7 +205,7 @@ public class OrderService {
 //        Map<Long, String> storeNameMap = storeClient.getStoreInfoMap(request, storeIds);            // 가게 정보 조회(StoreName)
 //        Map<Long, String> storeImgMap = storeClient.getStoreImageInfoMap(request, storeIds);      // 가게 정보 조회(StoreImageUrl)
 //        Result<List<GetItemsInfoDto>> itemNameMap = storeClient.getItem(authorization, itemIds);    // 아이템 정보 조회(itemName)
-        Map<Long, String> itemInfoMap = storeClient.getItemInfoMap(request, itemIds);// 아이템 정보 조회(itemName)
+
 
         for (OrderResponseDto.OrderHistory orderHistory : orderHistoryList) {
             String storeName = storeNameMap.get(orderHistory.getStoreId());

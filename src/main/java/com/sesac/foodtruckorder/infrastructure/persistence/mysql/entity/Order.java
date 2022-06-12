@@ -13,6 +13,7 @@ import static javax.persistence.FetchType.LAZY;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(value = {OrderListener.class})
 @Getter
 @Table(name = "orders")
 @Entity
