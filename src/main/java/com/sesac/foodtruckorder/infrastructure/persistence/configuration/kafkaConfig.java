@@ -21,7 +21,7 @@ public class kafkaConfig {
     private final String kafakaServerPort;
 
     public kafkaConfig(@Value("${kafka.host}") String kafkaServerHost,
-                       @Value("${kafka.port") String kafkaServerPort) {
+                       @Value("${kafka.port}") String kafkaServerPort) {
         this.kafakaServerHost = kafkaServerHost;
         this.kafakaServerPort = kafkaServerPort;
     }
