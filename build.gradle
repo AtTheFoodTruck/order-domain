@@ -52,6 +52,10 @@ dependencies {
     // Querydsl
     implementation 'com.querydsl:querydsl-jpa'
 
+    // zipkin & sleuth
+    implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+    implementation 'org.springframework.cloud:spring-cloud-starter-zipkin:2.2.3.RELEASE'
+
     // Querydsl JPAAnnotationProcessor 사용 지정
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
     // java.lang.NoClassDefFoundError(javax.annotation.Entity) 발생 대응
