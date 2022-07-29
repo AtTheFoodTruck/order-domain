@@ -46,8 +46,15 @@ dependencies {
     // Feign Client
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
     // Querydsl
     implementation 'com.querydsl:querydsl-jpa'
+
+    // zipkin & sleuth
+    implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+    implementation 'org.springframework.cloud:spring-cloud-starter-zipkin:2.2.3.RELEASE'
 
     // Querydsl JPAAnnotationProcessor 사용 지정
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
@@ -56,18 +63,20 @@ dependencies {
     // java.lang.NoClassDefFoundError(javax.annotation.Generated) 발생 대응
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 
+
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'mysql:mysql-connector-java'
 //    runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
     //JUnit4 추가
     testImplementation("org.junit.vintage:junit-vintage-engine") {
         exclude group: "org.hamcrest", module: "hamcrest-core"
     }
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
 }
 

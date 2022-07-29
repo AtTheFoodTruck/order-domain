@@ -139,6 +139,7 @@ public class OrderService {
                 .map(order -> OrderResponseDto.OrderHistory.of(order))
                 .collect(Collectors.toList());
 
+        // Primary Key를 Set 객체에 저장
         Set<Long> storeIds = new HashSet<>();
         Set<Long> itemIds = new HashSet<>();
 
@@ -150,6 +151,7 @@ public class OrderService {
         }
 
         List<GetStoreResponse> data = storeClient.getStoreNameImageMap(authorization, storeIds).getData();
+        Map<Long, String> itemInfoMap = storeClient.getItemInfoMap(request, itemIds);// 아이템 정보 조회(itemName)
 
         Map<Long, String> storeNameMap = data.stream().collect(
                 Collectors.toMap(getStoreResponse -> getStoreResponse.getStoreId()
@@ -162,6 +164,7 @@ public class OrderService {
         );
 
         Map<Long, String> itemInfoMap = storeClient.getItemInfoMap(request, itemIds);// 아이템 정보 조회(itemName)
+
 
         for (OrderResponseDto.OrderHistory orderHistory : orderHistoryList) {
             String storeName = storeNameMap.get(orderHistory.getStoreId());
