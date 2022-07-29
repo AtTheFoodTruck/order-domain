@@ -26,6 +26,13 @@ spring:
         default_batch_fetch_size: 1000 #??? ??
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
 
+  zipkin:
+    base-url: http://127.0.0.1:9411
+    enabled: true
+  sleuth:
+    sampler:
+      probability: 1.0
+
 logging:
   level:
     org.hibernate.SQL: debug
